@@ -26,41 +26,33 @@
     </script>
 
 
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <base href="/web" />
+        <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
+        <link rel="stylesheet" href="app.css" />
+        <link rel="stylesheet" href="Blazor_web_app.styles.css" />
+        <link rel="icon" type="image/png" href="favicon.png" />
+        <HeadOutlet />
+    </head>
 
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BlazorWebAssemblyApp1</title>
+    <body>
+        <Routes />
+        <div id="app">
+            <svg class="loading-progress">
+                <circle r="40%" cx="50%" cy="50%" />
+                <circle r="40%" cx="50%" cy="50%" />
+            </svg>
+            <div class="loading-progress-text"></div>
+        </div>
 
-    <!-- per esecuzione su localhost   <base href="/" />  -->
-    <!-- per esecuzione su GitHub   <base href="/web/" />  -->
-    <base href="/web/" />
-
-    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
-    <link rel="stylesheet" href="css/app.css" />
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <link href="BlazorWebAssemblyApp1.styles.css" rel="stylesheet" />
-
-
-
-
-
-</head>
-
-<body>
-    <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
-    </div>
-
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
-    </div>
-    <script src="_framework/blazor.webassembly.js"></script>
-</body>
+        <div id="blazor-error-ui">
+            An unhandled error has occurred.
+            <a href="" class="reload">Reload</a>
+            <a class="dismiss">🗙</a>
+        </div>
+        <script src="_framework/blazor.web.js"></script>
+    </body>
 
 </html>
