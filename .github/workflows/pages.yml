@@ -1,4 +1,4 @@
-# modifica per trigger sesta volta  
+# modifica per trigger settima volta  
 name: Deploy Blazor WASM to GitHub Pages
 
 on:
