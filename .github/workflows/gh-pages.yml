@@ -1,4 +1,4 @@
-
+# commento
 name: Deploy Blazor WASM to gh-pages (fallback)
 
 on:
