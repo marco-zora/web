@@ -1,3 +1,4 @@
+# modifica per trigger
 name: Deploy Blazor WASM to GitHub Pages
 
 on:
