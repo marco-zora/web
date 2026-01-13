@@ -1,4 +1,4 @@
-# commento
+
 name: Deploy Blazor WASM to gh-pages (fallback)
 
 on:
@@ -6,15 +6,19 @@ on:
     branches: ["main"]
   workflow_dispatch:
 
+# Serve per poter pushare su gh-pages usando GITHUB_TOKEN
 permissions:
-  contents: write  # serve per pushare su gh-pages con GITHUB_TOKEN
+  contents: write
 
 env:
-  PROJECT_DIR: video-uploader/BlazorApp1      # cartella che CONTIENE il .csproj
-  PROJECT_FILE: BlazorApp1.csproj             # nome del .csproj
+  # Cartella che CONTIENE il .csproj
+  PROJECT_DIR: video-uploader/BlazorApp1
+  # Nome esatto del progetto
+  PROJECT_FILE: BlazorApp1.csproj
+  # Cartella di output del publish
   PUBLISH_DIR: ${{ github.workspace }}/publish/wwwroot
-  # URL pubblico su GitHub Pages:
-  BASE_HREF: video-uploader/
+  # URL pubblico su GitHub Pages (Blazor: base href)
+  BASE_HREF: /web/video-uploader/
 
 jobs:
   build-and-publish:
@@ -26,41 +30,40 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '10.0.x'   # allineato a net10.0
+
+      # (facoltativo) Diagnostica rapida
+      - name: Dotnet info
+        run: dotnet --info
 
       - name: Restore
         working-directory: ${{ env.PROJECT_DIR }}
-        run: dotnet restore $PROJECT_FILE
+        run: dotnet restore ${{ env.PROJECT_FILE }}
 
       - name: Build
         working-directory: ${{ env.PROJECT_DIR }}
-        run: dotnet build $PROJECT_FILE -c Release --no-restore
+        run: dotnet build ${{ env.PROJECT_FILE }} -c Release --no-restore
 
       - name: Publish
         working-directory: ${{ env.PROJECT_DIR }}
-        run: dotnet publish $PROJECT_FILE -c Release -o ${{ github.workspace }}/publish --no-build
+        run: dotnet publish ${{ env.PROJECT_FILE }} -c Release -o ${{ github.workspace }}/publish --no-build
 
-      # Riscrive / -> /web/video-uploader/ (doc MS per Pages)
+      # Riscrive / -> /web/video-uploader/
       - name: Rewrite base href
         run: |
           sed -i 's|<base href="/"|<base href="${{ env.BASE_HREF }}"|g' $PUBLISH_DIR/index.html
 
-      # SPA fallback + nojekyll (Pages servirà correttamente /counter, /fetchdata, ecc.)
+      # SPA fallback + disattiva Jekyll (necessario per file _framework/…)
       - name: Add 404.html and .nojekyll
         run: |
           cp $PUBLISH_DIR/index.html $PUBLISH_DIR/404.html
           touch $PUBLISH_DIR/.nojekyll
 
-      # Pubblica i file statici sul branch gh-pages (bypass API deploy-pages)
+      # Pubblica i file nel branch gh-pages sotto /video-uploader
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ${{ env.PUBLISH_DIR }}
-          # facoltativo: crea un branch “orphan” pulloy from a branch**
-          #- **Branch = `gh-pages`** + **/ (root)**
-
----
-
-## 4) Verifica il sito
-Apri:
+          destination_dir: video-uploader   # <<< pubblica in /video-uploader/
+          force_orphan: true                # branch pulito (opzionale)
