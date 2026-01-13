@@ -17,7 +17,7 @@ env:
   PROJECT_FILE: BlazorApp1.csproj
   # Cartella di output del publish
   #PUBLISH_DIR: ${{ github.workspace }}/publish/wwwroot
-  PUBLISH_DIR: ${{ github.workspace }}/publish
+  PUBLISH_DIR: ${{ github.workspace }}
 
   # URL pubblico su GitHub Pages (Blazor: base href)
   BASE_HREF: /web/video-uploader/
