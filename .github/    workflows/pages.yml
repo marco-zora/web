@@ -12,7 +12,7 @@ permissions:
   id-token: write
 
 env:
-  PROJECT_PATH: web/video-uploader/BlazorApp1.csproj
+  PROJECT_PATH: web/video-uploader/BlazorApp1/BlazorApp1.csproj
   PUBLISH_DIR: ${{ github.workspace }}/publish/wwwroot
   BASE_HREF: /web/video-uploader/
 
@@ -26,19 +26,19 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: '9.0.x'   # Se in VS hai impostato .NET 10, puoi usare '10.0.x'
 
       - name: Publish Blazor WASM
         run: dotnet publish $PROJECT_PATH -c Release -o publish
 
-      # Riscrittura base-href (azione consigliata da Microsoft)
+      # Riscrive <base href> nell'index.html a /web/video-uploader/
       - name: Rewrite base href
         uses: SteveSandersonMS/ghaction-rewrite-base-href@v1
         with:
           html_path: ${{ env.PUBLISH_DIR }}/index.html
           base_href: ${{ env.BASE_HREF }}
 
-      # Fallback SPA + evita Jekyll
+      # Aggiunge fallback SPA e disabilita Jekyll
       - name: Add 404.html and .nojekyll
         run: |
           cp $PUBLISH_DIR/index.html $PUBLISH_DIR/404.html
