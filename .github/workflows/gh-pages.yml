@@ -1,0 +1,66 @@
+
+name: Deploy Blazor WASM to gh-pages (fallback)
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: write  # serve per pushare su gh-pages con GITHUB_TOKEN
+
+env:
+  PROJECT_DIR: video-uploader/BlazorApp1      # cartella che CONTIENE il .csproj
+  PROJECT_FILE: BlazorApp1.csproj             # nome del .csproj
+  PUBLISH_DIR: ${{ github.workspace }}/publish/wwwroot
+  # URL pubblico su GitHub Pages:
+  BASE_HREF: /web/video-uploader/
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: dotnet restore $PROJECT_FILE
+
+      - name: Build
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: dotnet build $PROJECT_FILE -c Release --no-restore
+
+      - name: Publish
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: dotnet publish $PROJECT_FILE -c Release -o ${{ github.workspace }}/publish --no-build
+
+      # Riscrive / -> /web/video-uploader/ (doc MS per Pages)
+      - name: Rewrite base href
+        run: |
+          sed -i 's|<base href="/"|<base href="${{ env.BASE_HREF }}"|g' $PUBLISH_DIR/index.html
+
+      # SPA fallback + nojekyll (Pages servirà correttamente /counter, /fetchdata, ecc.)
+      - name: Add 404.html and .nojekyll
+        run: |
+          cp $PUBLISH_DIR/index.html $PUBLISH_DIR/404.html
+          touch $PUBLISH_DIR/.nojekyll
+
+      # Pubblica i file statici sul branch gh-pages (bypass API deploy-pages)
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ${{ env.PUBLISH_DIR }}
+          # facoltativo: crea un branch “orphan” pulloy from a branch**
+          #- **Branch = `gh-pages`** + **/ (root)**
+
+---
+
+## 4) Verifica il sito
+Apri:
