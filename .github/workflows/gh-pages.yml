@@ -14,7 +14,7 @@ env:
   PROJECT_FILE: BlazorApp1.csproj             # nome del .csproj
   PUBLISH_DIR: ${{ github.workspace }}/publish/wwwroot
   # URL pubblico su GitHub Pages:
-  BASE_HREF: /web/video-uploader/
+  BASE_HREF: video-uploader/
 
 jobs:
   build-and-publish:
