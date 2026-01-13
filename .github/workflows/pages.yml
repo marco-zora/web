@@ -12,7 +12,7 @@ permissions:
   id-token: write
 
 env:
-  PROJECT_PATH: web/video-uploader/BlazorApp1/BlazorApp1.csproj
+  PROJECT_PATH: video-uploader/BlazorApp1/BlazorApp1.csproj
   PUBLISH_DIR: ${{ github.workspace }}/publish/wwwroot
   BASE_HREF: /web/video-uploader/
 
