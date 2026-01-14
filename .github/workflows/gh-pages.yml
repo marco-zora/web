@@ -9,6 +9,16 @@ on:
 # Serve per poter pushare su gh-pages usando GITHUB_TOKEN
 permissions:
   contents: write
+  
+  # +aggiunto
+  pages: write
+  id-token: write
+
+  # +aggiunto
+  #concurrency:
+  #group: "pages"
+  #cancel-in-progress: false
+
 
 env:
   # Cartella che CONTIENE il .csproj
@@ -16,8 +26,8 @@ env:
   # Nome esatto del progetto
   PROJECT_FILE: BlazorApp1.csproj
   # Cartella di output del publish
-  #PUBLISH_DIR: ${{ github.workspace }}/publish/wwwroot
-  PUBLISH_DIR: ${{ github.workspace }}
+  PUBLISH_DIR: ${{ github.workspace }}/publish/wwwroot
+  
 
   # URL pubblico su GitHub Pages (Blazor: base href)
   BASE_HREF: /web/video-uploader/
@@ -27,12 +37,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 # actions/checkout@v5 ?
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v4 # actions/setup-dotnet@v5 ?
         with:
           dotnet-version: '10.0.x'   # allineato a net10.0
+
 
       # (facoltativo) Diagnostica rapida
       - name: Dotnet info
