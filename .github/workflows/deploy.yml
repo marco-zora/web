@@ -24,6 +24,15 @@ jobs:
   # Build job
   build:
     runs-on: ubuntu-latest
+
+
+    env:
+      PROJECT_PATH: BlazorApp1.csproj     # <-- il tuo csproj è nella root della worktree
+      PUBLISH_DIR: release/wwwroot
+      REPO_SUBDIR: web                    # <-- nome repo: cartella finale su Pages
+
+
+
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -42,6 +51,7 @@ jobs:
         uses: actions/upload-pages-artifact@v4
         with:
           path: ${{ steps.prepare.outputs.wwwroot-path }}
+	enable_jekyll: false    # <-- CREA automaticamente .nojekyll nel branch gh-pages
 
   # Deployment job
   deploy:
@@ -54,4 +64,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-	enable_jekyll: false    # <-- CREA automaticamente .nojekyll nel branch gh-pages
+	
