@@ -1,0 +1,29 @@
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build output
+bin/
+obj/
+Debug/
+Release/
+
+# NuGet
+*.nupkg
+packages/
+project.lock.json
+
+# ASP.NET/Blazor artifacts
+**/wwwroot/*.map
+
+# Logs
+*.log
+
+# Editors
+.idea/
+.vscode/
+
+# Publish
+publish/

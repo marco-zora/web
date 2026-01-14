@@ -1,0 +1,14 @@
+
+* text=auto eol=lf
+
+# Tratta i file del repo come UTF-8
+*.cs     text diff=csharp
+*.razor  text
+*.csproj text
+*.sln    text
+
+# Binary files
+*.dll    binary
+*.wasm   binary
+*.png    binary
+*.jpg    binary
