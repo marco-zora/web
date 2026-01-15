@@ -1,0 +1,37 @@
+﻿@page "/upload"
+@inject NavigationManager Nav
+
+<h3>Carica i tuoi file</h3>
+
+<p>
+    Clicca il pulsante qui sotto per aprire la pagina di upload protetta di OneDrive.
+</p>
+
+<button class="btn btn-primary" @onclick="ApriFileRequest">
+    Carica file su OneDrive
+</button>
+
+@code {
+    // 👉 Incolla qui il tuo link di File Request OneDrive.
+    //private string fileRequestUrl = "https://1drv.ms/u/s!XXXXXXXXXXXXXX";
+    private string fileRequestUrl = "https://cnrsc-my.sharepoint.com/:f:/g/personal/marcomaria_zora_cnr_it/IgBduHaMs9w8Rrv0sGzseFl0AdC6oy9w5_UP0wngjZvbgjQ";
+
+    void ApriFileRequest()
+    {
+        // Apre il link in una nuova scheda
+        Nav.NavigateTo(fileRequestUrl, forceLoad: true);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
