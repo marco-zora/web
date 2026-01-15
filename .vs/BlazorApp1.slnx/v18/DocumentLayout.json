@@ -1,7 +1,12 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|c:\\users\\marco\\onedrive - cnr\\zoratech\\visualstudio2026\\blazorapp1\\pages\\weather.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|solutionrelative:pages\\weather.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,8 +14,21 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 0,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Weather.razor",
+              "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\Weather.razor",
+              "RelativeDocumentMoniker": "Pages\\Weather.razor",
+              "ToolTip": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\Weather.razor",
+              "RelativeToolTip": "Pages\\Weather.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-01-14T17:44:19.257Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
