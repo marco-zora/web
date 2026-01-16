@@ -1,5 +1,6 @@
 ﻿@page "/upload"
 @using Microsoft.AspNetCore.Components.Forms
+@using System.Text
 @using System.Xml.Linq
 @inject NavigationManager Nav
 @inject HttpClient Http
@@ -124,6 +125,7 @@ else
     }
 
     // ===== Lista (PROPFIND Depth:1) ====
+
     private async Task RefreshListAsync()
     {
         Loading = true;
@@ -131,10 +133,22 @@ else
         try
         {
             var url = new Uri(ProxyBase + "UPLOADS/");
+
+            // Corpo XML esplicito con le property che ci servono
+            const string body = @"<?xml version=""1.0"" encoding=""utf-8""?> <d:propfind 
+            xmlns:d=""DAV:"">  
+                <d:prop>
+                <d:displayname/>
+                <d:resourcetype/>
+                <d:getcontentlength/>
+                <d:getlastmodified/>
+                </d:prop>
+                </d:propfind>";
+
             using var req = new HttpRequestMessage(HttpMethod.Post, url);
             req.Headers.Add("X-Method-Override", "PROPFIND");
             req.Headers.Add("Depth", "1");
-            req.Content = new StringContent(""); // body vuoto
+            req.Content = new StringContent(body, Encoding.UTF8, "text/xml");
 
             var res = await Http.SendAsync(req);
             if (!res.IsSuccessStatusCode)
@@ -159,6 +173,7 @@ else
         }
     }
 
+
     private static List<DavItem> ParsePropfind(string xml)
     {
         var list = new List<DavItem>();
@@ -167,29 +182,46 @@ else
 
         foreach (var resp in x.Descendants(d + "response"))
         {
+            // href è sempre presente e affidabile
+            var href = resp.Element(d + "href")?.Value ?? "";
+            if (string.IsNullOrWhiteSpace(href)) continue;
+
+            // Prendi il <prop> dal/nei <propstat>
             var prop = resp.Descendants(d + "prop").FirstOrDefault();
-            if (prop is null) continue;
+            var displayName = prop?.Element(d + "displayname")?.Value ?? "";
 
-            var name = prop.Element(d + "displayname")?.Value ?? "";
-            var isCollection = prop.Element(d + "resourcetype")?.Element(d + "collection") != null;
-            var sizeStr = prop.Element(d + "getcontentlength")?.Value ?? "0";
-            long.TryParse(sizeStr, out var size);
+            var isCollection = prop?.Element(d + "resourcetype")?.Element(d + "collection") != null;
 
-            // Salta la cartella principale "UPLOADS" (è una collection)
+            // Se displayname è vuoto, ricava il nome da href
+            // Esempio href: /remote.php/dav/files/api_app/UPLOADS/file.txt
+            var decodedHref = Uri.UnescapeDataString(href);
+            var nameFromHref = decodedHref.TrimEnd('/')
+                                          .Split('/', StringSplitOptions.RemoveEmptyEntries)
+                                          .LastOrDefault() ?? "";
+
+            var name = !string.IsNullOrWhiteSpace(displayName) ? displayName : nameFromHref;
+
+            // Salta la cartella radice "UPLOADS" (è una collection)
             if (isCollection) continue;
-            if (string.IsNullOrWhiteSpace(name)) continue;
+
+            // dimensione e last-modified (se disponibili)
+            long size = 0;
+            var sizeStr = prop?.Element(d + "getcontentlength")?.Value;
+            if (!string.IsNullOrWhiteSpace(sizeStr)) long.TryParse(sizeStr, out size);
 
             DateTimeOffset? lm = null;
-            var lmStr = prop.Element(d + "getlastmodified")?.Value;
+            var lmStr = prop?.Element(d + "getlastmodified")?.Value;
             if (!string.IsNullOrWhiteSpace(lmStr) && DateTimeOffset.TryParse(lmStr, out var lmv))
                 lm = lmv;
 
-            list.Add(new DavItem(name, IsFile: true, Size: size, LastModified: lm));
+            if (!string.IsNullOrWhiteSpace(name))
+                list.Add(new DavItem(name, IsFile: true, Size: size, LastModified: lm));
         }
 
-        // ordina per data desc
         return list.OrderByDescending(i => i.LastModified).ToList();
     }
+
+
 
     // ===== Download (apre in nuova scheda) ====
     private async Task DownloadAsync(string name)
