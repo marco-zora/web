@@ -41,7 +41,6 @@
 
 *@
 
-
 @page "/upload"
 @using Microsoft.AspNetCore.Components.Forms
 @inject NavigationManager Nav
@@ -49,7 +48,7 @@
 
 <h3>Carica i tuoi file</h3>
 
-<!-- CARD ONEDRIVE -->
+<!-- ===== CARD ONEDRIVE ===== -->
 <div class="card" style="margin-bottom:1rem;">
     <div class="card-body">
         <h5 class="card-title">OneDrive (File Request)</h5>
@@ -62,7 +61,7 @@
     </div>
 </div>
 
-<!-- CARD NEXTCLOUD -->
+<!-- ===== CARD NEXTCLOUD ===== -->
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Nextcloud (UPLOADS via WebDAV)</h5>
@@ -70,31 +69,33 @@
             Seleziona un file: verrà caricato nella cartella <strong>UPLOADS</strong> dell’utente tecnico <code>api_app</code>.
         </p>
 
-        <!-- Il label fa da pulsante e attiva l'input file nascosto -->
+        <!-- Il label funge da pulsante e attiva l'input file nascosto (no JS-interop necessario) -->
         <label class="btn btn-secondary" for="nc-file-input">
             Scegli file e carica su Nextcloud
         </label>
         <span class="ms-2">@Status</span>
 
-        <!-- InputFile nascosto: il "for" del label ci fa click senza JS -->
+        <!-- InputFile nascosto -->
         <InputFile id="nc-file-input" OnChange="HandleNextcloudUpload" style="display:none" />
     </div>
 </div>
 
 @code {
-    // ===== OneDrive: CORRETTO (stringa chiusa) =====
+    // ===== OneDrive: link File Request (stringa CHIUSA correttamente) =====
     private string oneDriveFileRequestUrl =
         "https://cnrsc-my.sharepoint.com/:f:/g/personal/marcomaria_zora_cnr_it/IgBduHaMs9w8Rrv0sGzseFl0AdC6oy9w5_UP0wngjZvbgjQ";
 
     void ApriOneDrive() => Nav.NavigateTo(oneDriveFileRequestUrl, forceLoad: true);
 
     // ===== Nextcloud (WebDAV) =====
-    // Base: ATTENZIONE allo slash finale e alle MAIUSCOLE in 'UPLOADS'
+    // Base WebDAV per l'utente api_app e cartella montata "UPLOADS"
+    // ATTENZIONE: slash finale "/" e nome cartella MAIUSCOLO come visto in UI
     private string WebDavBase =
         "https://lisosomialipalermo.irib.cnr.it/remote.php/dav/files/api_app/UPLOADS/";
 
+    // Usa una App Password di Nextcloud per l'utente api_app (Impostazioni -> Sicurezza -> Password per le app)
     private string Username = "api_app";
-    private string AppPassword = "<APP_PASSWORD_NC>"; // Sostituisci con App Password di api_app
+    private string AppPassword = "Nextcloud-files-2026!";  // <-- Sostituisci con la tua App Password
 
     private string Status = string.Empty;
 
@@ -107,25 +108,25 @@
         {
             Status = "Caricamento in corso…";
 
-            // Componi l'URL destinazione (nome file URL-encoded)
+            // Destinazione: codifica il nome file nella URL
             var target = new Uri(WebDavBase + Uri.EscapeDataString(file.Name));
 
             using var stream = file.OpenReadStream(long.MaxValue);
             using var content = new StreamContent(stream);
 
-            // PUT con Authorization nell'header della richiesta
+            // Richiesta PUT con Authorization in HEADER (non nel content)
             var req = new HttpRequestMessage(HttpMethod.Put, target)
             {
                 Content = content
             };
             var basic = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{Username}:{AppPassword}"));
             req.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", basic);
-            // (opzionale) header WebDAV
+            // (opzionale) suggerito per alcuni proxy DAV
             req.Headers.Add("Depth", "0");
 
             var res = await Http.SendAsync(req);
 
-            // Se la cartella non esiste (404), prova a crearla e ritenta
+            // Se la cartella non esiste (404), prova a crearla (MKCOL) e ritenta
             if (res.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 var mkcol = new HttpRequestMessage(new HttpMethod("MKCOL"), new Uri(WebDavBase));
@@ -147,15 +148,9 @@
         }
         catch (Exception ex)
         {
-            // Se vedi errori CORS in console, abilita CORS sul server Nextcloud o usa un micro-proxy.
+            // Se in console vedi errori CORS, abilita CORS su Nextcloud o usa un micro-proxy.
             Status = $"Errore: {ex.Message}";
         }
     }
 }
-
-
-
-
-
-
-
+``
