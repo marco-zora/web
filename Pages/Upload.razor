@@ -42,94 +42,116 @@
 *@
 
 
-
-
-
 @page "/upload"
+@using Microsoft.AspNetCore.Components.Forms
 @inject NavigationManager Nav
+@inject HttpClient Http
 
 <h3>Carica i tuoi file</h3>
 
-<p>
-    Scegli dove caricare i file:
-</p>
-
-<div class="btn-group" role="group" aria-label="Selezione destinazione upload">
-    <button class="btn btn-primary" @onclick="ApriFileRequest">
-        Carica su OneDrive (File Request)
-    </button>
-
-    @* Variante A: apri il link pubblico Nextcloud (File Drop) in nuova scheda *@
-    @if (!string.IsNullOrWhiteSpace(nextcloudFileDropUrl))
-    {
-        <button class="btn btn-secondary" @onclick="ApriNextcloudFileDrop">
-            Carica su Nextcloud (File Drop)
+<!-- CARD ONEDRIVE -->
+<div class="card" style="margin-bottom:1rem;">
+    <div class="card-body">
+        <h5 class="card-title">OneDrive (File Request)</h5>
+        <p class="card-text">
+            Apri il modulo ufficiale di OneDrive in una nuova scheda e carica i file.
+        </p>
+        <button class="btn btn-primary" @onclick="ApriOneDrive">
+            Carica su OneDrive
         </button>
-    }
-
-    @* Variante B: vai alla pagina interna che fa upload via WebDAV *@
-    <button class="btn btn-outline-secondary" @onclick="VaiAllaPaginaNextcloudUpload">
-        Carica su Nextcloud (pagina interna)
-    </button>
+    </div>
 </div>
 
-<hr />
+<!-- CARD NEXTCLOUD -->
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Nextcloud (UPLOADS via WebDAV)</h5>
+        <p class="card-text">
+            Seleziona un file: verrà caricato nella cartella <strong>UPLOADS</strong> dell’utente tecnico <code>api_app</code>.
+        </p>
 
-<ul>
-    <li><strong>OneDrive (File Request)</strong>: modulo nativo OneDrive, nessun login richiesto per chi carica.</li>
-    <li><strong>Nextcloud (File Drop)</strong>: modulo pubblico di solo upload (se hai creato il link di condivisione).</li>
-    <li><strong>Nextcloud (pagina interna)</strong>: usa la tua pagina <code>/nextcloud-upload</code> con upload via WebDAV.</li>
-</ul>
+        <!-- Il label fa da pulsante e attiva l'input file nascosto -->
+        <label class="btn btn-secondary" for="nc-file-input">
+            Scegli file e carica su Nextcloud
+        </label>
+        <span class="ms-2">@Status</span>
+
+        <!-- InputFile nascosto: il "for" del label ci fa click senza JS -->
+        <InputFile id="nc-file-input" OnChange="HandleNextcloudUpload" style="display:none" />
+    </div>
+</div>
 
 @code {
-    // ✅ OneDrive File Request (corretto: mancava la virgolette finale nella tua versione)
-    private string fileRequestUrl =
+    // ===== OneDrive: CORRETTO (stringa chiusa) =====
+    private string oneDriveFileRequestUrl =
         "https://cnrsc-my.sharepoint.com/:f:/g/personal/marcomaria_zora_cnr_it/IgBduHaMs9w8Rrv0sGzseFl0AdC6oy9w5_UP0wngjZvbgjQ";
 
-    // ✅ Variante A (facoltativa): Nextcloud File Drop (link pubblico di solo upload)
-    // Se non usi File Drop, lascia vuoto.
-    // Esempio: "https://lisosomialipalermo.irib.cnr.it/s/ABCDEFGH123456"
-    private string nextcloudFileDropUrl = "";
+    void ApriOneDrive() => Nav.NavigateTo(oneDriveFileRequestUrl, forceLoad: true);
 
-    // (Facoltativo) Dati Nextcloud per pagina interna /nextcloud-upload
-    // NOTA: non servono qui. Restano nella pagina NextcloudUpload.razor.
-    // Li lasciamo commentati per evitare di committare credenziali:
-    //
-    // private string WebDavBase = "https://lisosomialipalermo.irib.cnr.it/remote.php/dav/files/api_app/UPLOADS/";
-    // private string Username = "api_app";
-    // private string AppPassword = "<APP_PASSWORD>";
+    // ===== Nextcloud (WebDAV) =====
+    // Base: ATTENZIONE allo slash finale e alle MAIUSCOLE in 'UPLOADS'
+    private string WebDavBase =
+        "https://lisosomialipalermo.irib.cnr.it/remote.php/dav/files/api_app/UPLOADS/";
 
-    void ApriFileRequest()
+    private string Username = "api_app";
+    private string AppPassword = "<APP_PASSWORD_NC>"; // Sostituisci con App Password di api_app
+
+    private string Status = string.Empty;
+
+    private async Task HandleNextcloudUpload(InputFileChangeEventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(fileRequestUrl))
-            return;
+        var file = e.File;
+        if (file is null) return;
 
-        // Apre OneDrive File Request in una nuova scheda
-        Nav.NavigateTo(fileRequestUrl, forceLoad: true);
-    }
+        try
+        {
+            Status = "Caricamento in corso…";
 
-    void ApriNextcloudFileDrop()
-    {
-        if (string.IsNullOrWhiteSpace(nextcloudFileDropUrl))
-            return;
+            // Componi l'URL destinazione (nome file URL-encoded)
+            var target = new Uri(WebDavBase + Uri.EscapeDataString(file.Name));
 
-        // Apre Nextcloud File Drop in una nuova scheda
-        Nav.NavigateTo(nextcloudFileDropUrl, forceLoad: true);
-    }
+            using var stream = file.OpenReadStream(long.MaxValue);
+            using var content = new StreamContent(stream);
 
-    void VaiAllaPaginaNextcloudUpload()
-    {
-        // Naviga alla tua pagina interna che fa upload via WebDAV
-        Nav.NavigateTo("/nextcloud-upload");
+            // PUT con Authorization nell'header della richiesta
+            var req = new HttpRequestMessage(HttpMethod.Put, target)
+            {
+                Content = content
+            };
+            var basic = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{Username}:{AppPassword}"));
+            req.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", basic);
+            // (opzionale) header WebDAV
+            req.Headers.Add("Depth", "0");
+
+            var res = await Http.SendAsync(req);
+
+            // Se la cartella non esiste (404), prova a crearla e ritenta
+            if (res.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                var mkcol = new HttpRequestMessage(new HttpMethod("MKCOL"), new Uri(WebDavBase));
+                mkcol.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", basic);
+                _ = await Http.SendAsync(mkcol);
+
+                stream.Position = 0;
+                var retry = new HttpRequestMessage(HttpMethod.Put, target)
+                {
+                    Content = new StreamContent(stream)
+                };
+                retry.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", basic);
+                res = await Http.SendAsync(retry);
+            }
+
+            Status = res.IsSuccessStatusCode
+                ? $"Caricato su Nextcloud: {file.Name}"
+                : $"Errore Nextcloud {(int)res.StatusCode} {res.ReasonPhrase}";
+        }
+        catch (Exception ex)
+        {
+            // Se vedi errori CORS in console, abilita CORS sul server Nextcloud o usa un micro-proxy.
+            Status = $"Errore: {ex.Message}";
+        }
     }
 }
-
-
-
-
-
-
-
 
 
 
