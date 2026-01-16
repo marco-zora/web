@@ -174,52 +174,69 @@ else
     }
 
 
+
     private static List<DavItem> ParsePropfind(string xml)
     {
         var list = new List<DavItem>();
-        var x = XDocument.Parse(xml);
+        var doc = XDocument.Parse(xml);
         XNamespace d = "DAV:";
 
-        foreach (var resp in x.Descendants(d + "response"))
+        foreach (var resp in doc.Descendants(d + "response"))
         {
-            // href è sempre presente e affidabile
             var href = resp.Element(d + "href")?.Value ?? "";
-            if (string.IsNullOrWhiteSpace(href)) continue;
+            if (string.IsNullOrWhiteSpace(href))
+                continue;
 
-            // Prendi il <prop> dal/nei <propstat>
-            var prop = resp.Descendants(d + "prop").FirstOrDefault();
-            var displayName = prop?.Element(d + "displayname")?.Value ?? "";
+            // Ogni item può avere più propstat. Scegliamo quello 200 OK.
+            var propstat = resp.Elements(d + "propstat")
+                               .FirstOrDefault(ps =>
+                                   (string?)ps.Element(d + "status") != null &&
+                                   ps.Element(d + "status")!.Value.Contains("200"));
 
-            var isCollection = prop?.Element(d + "resourcetype")?.Element(d + "collection") != null;
+            if (propstat == null)
+                continue;
 
-            // Se displayname è vuoto, ricava il nome da href
-            // Esempio href: /remote.php/dav/files/api_app/UPLOADS/file.txt
+            var prop = propstat.Element(d + "prop");
+            if (prop == null)
+                continue;
+
+            // Nome dal displayname o dal href
+            var displayName = prop.Element(d + "displayname")?.Value ?? "";
             var decodedHref = Uri.UnescapeDataString(href);
             var nameFromHref = decodedHref.TrimEnd('/')
                                           .Split('/', StringSplitOptions.RemoveEmptyEntries)
                                           .LastOrDefault() ?? "";
 
-            var name = !string.IsNullOrWhiteSpace(displayName) ? displayName : nameFromHref;
+            var name = string.IsNullOrWhiteSpace(displayName) ? nameFromHref : displayName;
 
-            // Salta la cartella radice "UPLOADS" (è una collection)
-            if (isCollection) continue;
+            // Cartelle (collection) → saltate
+            var isCollection = prop.Element(d + "resourcetype")?.Element(d + "collection") != null;
+            if (isCollection)
+                continue;
 
-            // dimensione e last-modified (se disponibili)
+            // Dimensione
             long size = 0;
-            var sizeStr = prop?.Element(d + "getcontentlength")?.Value;
-            if (!string.IsNullOrWhiteSpace(sizeStr)) long.TryParse(sizeStr, out size);
+            var sizeStr = prop.Element(d + "getcontentlength")?.Value;
+            if (!string.IsNullOrWhiteSpace(sizeStr))
+                long.TryParse(sizeStr, out size);
 
+            // Ultima modifica
             DateTimeOffset? lm = null;
-            var lmStr = prop?.Element(d + "getlastmodified")?.Value;
+            var lmStr = prop.Element(d + "getlastmodified")?.Value;
             if (!string.IsNullOrWhiteSpace(lmStr) && DateTimeOffset.TryParse(lmStr, out var lmv))
                 lm = lmv;
 
-            if (!string.IsNullOrWhiteSpace(name))
-                list.Add(new DavItem(name, IsFile: true, Size: size, LastModified: lm));
+            // Evita la voce radice se appare come file
+            if (string.IsNullOrWhiteSpace(name) || name == "UPLOADS")
+                continue;
+
+            list.Add(new DavItem(name, IsFile: true, Size: size, LastModified: lm));
         }
 
+        // Ordina per data discendente
         return list.OrderByDescending(i => i.LastModified).ToList();
     }
+
 
 
 
