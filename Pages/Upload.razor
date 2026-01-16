@@ -1,51 +1,9 @@
-﻿
-@* 
-@page "/upload"
-@inject NavigationManager Nav
-
-
-
-
-
-
-<h3>Carica i tuoi file</h3>
-
-<p>
-    Clicca il pulsante qui sotto per aprire la pagina di upload protetta di OneDrive.
-</p>
-
-<button class="btn btn-primary" @onclick="ApriFileRequest">
-    Carica file su OneDrive
-</button>
-
-
-
-
-
-@code {
-    // 👉 Incolla qui il tuo link di File Request OneDrive.
-    //private string fileRequestUrl = "https://1drv.ms/u/s!XXXXXXXXXXXXXX";
-    private string fileRequestUrl = "https://cnrsc-my.sharepoint.com/:f:/g/personal/marcomaria_zora_cnr_it/IgBduHaMs9w8Rrv0sGzseFl0AdC6oy9w5_UP0wngjZvbgjQ";
-
-    string WebDavBase = "https://lisosomialipalermo.irib.cnr.it/remote.php/dav/files/api_app/UPLOADS/";
-    string Username = "api_app";
-    string AppPassword = "<Nextcloud-files-2026>";
-
-
-    void ApriFileRequest()
-    {
-        // Apre il link in una nuova scheda
-        Nav.NavigateTo(fileRequestUrl, forceLoad: true);
-    }
-}
-
-*@
-
-@page "/upload"
+﻿@page "/upload"
 @using Microsoft.AspNetCore.Components.Forms
+@using System.Xml.Linq
 @inject NavigationManager Nav
 @inject HttpClient Http
-
+@inject IJSRuntime JS
 
 <h3>Carica i tuoi file</h3>
 
@@ -58,31 +16,83 @@
 <label class="btn btn-secondary ms-2" for="nc-file-input">
     Scegli file e carica su Nextcloud
 </label>
-
 <InputFile id="nc-file-input" OnChange="HandleNextcloudUpload" style="display:none" />
 
 <span class="ms-2">@Status</span>
-``
 
+<hr />
+
+<!-- Barra strumenti gestione -->
+<div class="d-flex align-items-center mb-2">
+    <button class="btn btn-outline-primary btn-sm" @onclick="RefreshListAsync">Aggiorna elenco</button>
+    <span class="ms-2 text-muted">@LastListRefreshText</span>
+</div>
+
+@if (Loading)
+{
+    <p>Caricamento elenco…</p>
+}
+else if (!string.IsNullOrEmpty(ListError))
+{
+    <p class="text-danger">@ListError</p>
+}
+else
+{
+    @if (Items.Count == 0)
+    {
+        <p>Nessun file in <code>UPLOADS</code>.</p>
+    }
+    else
+    {
+        <table class="table table-sm align-middle">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th class="text-end">Dimensione</th>
+                    <th>Ultima modifica</th>
+                    <th class="text-end">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var it in Items)
+                {
+                    <tr>
+                        <td>@it.Name</td>
+                        <td class="text-end">@FormatSize(it.Size)</td>
+                        <td>@(it.LastModified?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "")</td>
+                        <td class="text-end">
+                            <button class="btn btn-link btn-sm" @onclick="() => DownloadAsync(it.Name)">Scarica</button>
+                            <button class="btn btn-link btn-sm text-danger" @onclick="() => DeleteAsync(it.Name)">Elimina</button>
+                            <button class="btn btn-link btn-sm" @onclick="() => RenameAsync(it.Name)">Rinomina</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
 
 @code {
-
     // === OneDrive ===
     private string oneDriveFileRequestUrl =
         "https://cnrsc-my.sharepoint.com/:f:/g/personal/marcomaria_zora_cnr_it/IgBduHaMs9w8Rrv0sGzseFl0AdC6oy9w5_UP0wngjZvbgjQ";
-
-    void ApriOneDrive() =>
-        Nav.NavigateTo(oneDriveFileRequestUrl, forceLoad: true);
-
+    void ApriOneDrive() => Nav.NavigateTo(oneDriveFileRequestUrl, forceLoad: true);
 
     // === Nextcloud via Cloudflare Worker ===
-    // ⚠️ Usare SEMPRE /api/dav/ alla fine
-    private string ProxyBase =
-        "https://first.marcomaria-zora.workers.dev/api/dav/";
+    // ⚠️ Tenere /api/dav/ e lo slash finale
+    private string ProxyBase = "https://first.marcomaria-zora.workers.dev/api/dav/";
 
     private string Status = "";
+    private bool Loading = false;
+    private string? ListError = null;
+    private string LastListRefreshText = "";
 
+    // Modello per la lista
+    private List<DavItem> Items = new();
 
+    private record DavItem(string Name, bool IsFile, long Size, DateTimeOffset? LastModified);
+
+    // ===== Upload ====
     private async Task HandleNextcloudUpload(InputFileChangeEventArgs e)
     {
         var file = e.File;
@@ -92,22 +102,160 @@
         {
             Status = "Caricamento in corso…";
 
-            // 🔥 PATH DAV: scegliamo la cartella UPLOADS lato server
             var url = new Uri(ProxyBase + "UPLOADS/" + Uri.EscapeDataString(file.Name));
-
             using var stream = file.OpenReadStream(long.MaxValue);
             using var content = new StreamContent(stream);
 
             var res = await Http.PutAsync(url, content);
-
-            Status = res.IsSuccessStatusCode
-                ? $"Caricato su Nextcloud: {file.Name}"
-                : $"Errore {(int)res.StatusCode} {res.ReasonPhrase}";
+            if (res.IsSuccessStatusCode)
+            {
+                Status = $"Caricato su Nextcloud: {file.Name}";
+                await RefreshListAsync(); // aggiorna elenco dopo upload
+            }
+            else
+            {
+                Status = $"Errore {(int)res.StatusCode} {res.ReasonPhrase}";
+            }
         }
         catch (Exception ex)
         {
             Status = $"Errore: {ex.Message}";
         }
     }
+
+    // ===== Lista (PROPFIND Depth:1) ====
+    private async Task RefreshListAsync()
+    {
+        Loading = true;
+        ListError = null;
+        try
+        {
+            var url = new Uri(ProxyBase + "UPLOADS/");
+            using var req = new HttpRequestMessage(HttpMethod.Post, url);
+            req.Headers.Add("X-Method-Override", "PROPFIND");
+            req.Headers.Add("Depth", "1");
+            req.Content = new StringContent(""); // body vuoto
+
+            var res = await Http.SendAsync(req);
+            if (!res.IsSuccessStatusCode)
+            {
+                ListError = $"Errore elenco {(int)res.StatusCode} {res.ReasonPhrase}";
+                Items.Clear();
+                return;
+            }
+
+            var xml = await res.Content.ReadAsStringAsync();
+            Items = ParsePropfind(xml);
+            LastListRefreshText = $"(aggiornato alle {DateTime.Now:HH:mm:ss})";
+        }
+        catch (Exception ex)
+        {
+            ListError = ex.Message;
+            Items.Clear();
+        }
+        finally
+        {
+            Loading = false;
+        }
+    }
+
+    private static List<DavItem> ParsePropfind(string xml)
+    {
+        var list = new List<DavItem>();
+        var x = XDocument.Parse(xml);
+        XNamespace d = "DAV:";
+
+        foreach (var resp in x.Descendants(d + "response"))
+        {
+            var prop = resp.Descendants(d + "prop").FirstOrDefault();
+            if (prop is null) continue;
+
+            var name = prop.Element(d + "displayname")?.Value ?? "";
+            var isCollection = prop.Element(d + "resourcetype")?.Element(d + "collection") != null;
+            var sizeStr = prop.Element(d + "getcontentlength")?.Value ?? "0";
+            long.TryParse(sizeStr, out var size);
+
+            // Salta la cartella principale "UPLOADS" (è una collection)
+            if (isCollection) continue;
+            if (string.IsNullOrWhiteSpace(name)) continue;
+
+            DateTimeOffset? lm = null;
+            var lmStr = prop.Element(d + "getlastmodified")?.Value;
+            if (!string.IsNullOrWhiteSpace(lmStr) && DateTimeOffset.TryParse(lmStr, out var lmv))
+                lm = lmv;
+
+            list.Add(new DavItem(name, IsFile: true, Size: size, LastModified: lm));
+        }
+
+        // ordina per data desc
+        return list.OrderByDescending(i => i.LastModified).ToList();
+    }
+
+    // ===== Download (apre in nuova scheda) ====
+    private async Task DownloadAsync(string name)
+    {
+        var url = ProxyBase + "UPLOADS/" + Uri.EscapeDataString(name);
+        await JS.InvokeVoidAsync("open", url, "_blank");
+    }
+
+    // ===== Delete ====
+    private async Task DeleteAsync(string name)
+    {
+        var conferma = await JS.InvokeAsync<bool>("confirm", $"Eliminare '{name}'?");
+        if (!conferma) return;
+
+        var url = new Uri(ProxyBase + "UPLOADS/" + Uri.EscapeDataString(name));
+        var res = await Http.DeleteAsync(url);
+        if (res.IsSuccessStatusCode)
+        {
+            Status = $"Eliminato: {name}";
+            await RefreshListAsync();
+        }
+        else
+        {
+            Status = $"Errore eliminazione {(int)res.StatusCode} {res.ReasonPhrase}";
+        }
+    }
+
+    // ===== Rename (MOVE) ====
+    private async Task RenameAsync(string oldName)
+    {
+        var newName = await JS.InvokeAsync<string?>("prompt", $"Nuovo nome per '{oldName}':", oldName);
+        if (string.IsNullOrWhiteSpace(newName) || newName == oldName) return;
+
+        var src = new Uri(ProxyBase + "UPLOADS/" + Uri.EscapeDataString(oldName));
+        var dst = ProxyBase + "UPLOADS/" + Uri.EscapeDataString(newName);
+
+        using var req = new HttpRequestMessage(HttpMethod.Post, src);
+        req.Headers.Add("X-Method-Override", "MOVE");
+        req.Headers.Add("Destination", dst);
+        req.Headers.Add("Overwrite", "T");
+
+        var res = await Http.SendAsync(req);
+        if (res.IsSuccessStatusCode)
+        {
+            Status = $"Rinominato in: {newName}";
+            await RefreshListAsync();
+        }
+        else
+        {
+            Status = $"Errore rinomina {(int)res.StatusCode} {res.ReasonPhrase}";
+        }
+    }
+
+    // ===== Utilità ====
+    private static string FormatSize(long bytes)
+    {
+        if (bytes < 1024) return $"{bytes} B";
+        double kb = bytes / 1024d;
+        if (kb < 1024) return $"{kb:0.0} KB";
+        double mb = kb / 1024d;
+        if (mb < 1024) return $"{mb:0.0} MB";
+        double gb = mb / 1024d;
+        return $"{gb:0.0} GB";
+    }
+
+    // Carica lista iniziale alla prima apertura
+    protected override async Task OnInitializedAsync() => await RefreshListAsync();
 }
-``
+
