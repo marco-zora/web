@@ -1,5 +1,12 @@
-﻿@page "/upload"
+﻿
+@* 
+@page "/upload"
 @inject NavigationManager Nav
+
+
+
+
+
 
 <h3>Carica i tuoi file</h3>
 
@@ -11,10 +18,19 @@
     Carica file su OneDrive
 </button>
 
+
+
+
+
 @code {
     // 👉 Incolla qui il tuo link di File Request OneDrive.
     //private string fileRequestUrl = "https://1drv.ms/u/s!XXXXXXXXXXXXXX";
     private string fileRequestUrl = "https://cnrsc-my.sharepoint.com/:f:/g/personal/marcomaria_zora_cnr_it/IgBduHaMs9w8Rrv0sGzseFl0AdC6oy9w5_UP0wngjZvbgjQ";
+
+    string WebDavBase = "https://lisosomialipalermo.irib.cnr.it/remote.php/dav/files/api_app/UPLOADS/";
+    string Username = "api_app";
+    string AppPassword = "<Nextcloud-files-2026>";
+
 
     void ApriFileRequest()
     {
@@ -22,6 +38,92 @@
         Nav.NavigateTo(fileRequestUrl, forceLoad: true);
     }
 }
+
+*@
+
+
+
+
+
+@page "/upload"
+@inject NavigationManager Nav
+
+<h3>Carica i tuoi file</h3>
+
+<p>
+    Scegli dove caricare i file:
+</p>
+
+<div class="btn-group" role="group" aria-label="Selezione destinazione upload">
+    <button class="btn btn-primary" @onclick="ApriFileRequest">
+        Carica su OneDrive (File Request)
+    </button>
+
+    @* Variante A: apri il link pubblico Nextcloud (File Drop) in nuova scheda *@
+    @if (!string.IsNullOrWhiteSpace(nextcloudFileDropUrl))
+    {
+        <button class="btn btn-secondary" @onclick="ApriNextcloudFileDrop">
+            Carica su Nextcloud (File Drop)
+        </button>
+    }
+
+    @* Variante B: vai alla pagina interna che fa upload via WebDAV *@
+    <button class="btn btn-outline-secondary" @onclick="VaiAllaPaginaNextcloudUpload">
+        Carica su Nextcloud (pagina interna)
+    </button>
+</div>
+
+<hr />
+
+<ul>
+    <li><strong>OneDrive (File Request)</strong>: modulo nativo OneDrive, nessun login richiesto per chi carica.</li>
+    <li><strong>Nextcloud (File Drop)</strong>: modulo pubblico di solo upload (se hai creato il link di condivisione).</li>
+    <li><strong>Nextcloud (pagina interna)</strong>: usa la tua pagina <code>/nextcloud-upload</code> con upload via WebDAV.</li>
+</ul>
+
+@code {
+    // ✅ OneDrive File Request (corretto: mancava la virgolette finale nella tua versione)
+    private string fileRequestUrl =
+        "https://cnrsc-my.sharepoint.com/:f:/g/personal/marcomaria_zora_cnr_it/IgBduHaMs9w8Rrv0sGzseFl0AdC6oy9w5_UP0wngjZvbgjQ";
+
+    // ✅ Variante A (facoltativa): Nextcloud File Drop (link pubblico di solo upload)
+    // Se non usi File Drop, lascia vuoto.
+    // Esempio: "https://lisosomialipalermo.irib.cnr.it/s/ABCDEFGH123456"
+    private string nextcloudFileDropUrl = "";
+
+    // (Facoltativo) Dati Nextcloud per pagina interna /nextcloud-upload
+    // NOTA: non servono qui. Restano nella pagina NextcloudUpload.razor.
+    // Li lasciamo commentati per evitare di committare credenziali:
+    //
+    // private string WebDavBase = "https://lisosomialipalermo.irib.cnr.it/remote.php/dav/files/api_app/UPLOADS/";
+    // private string Username = "api_app";
+    // private string AppPassword = "<APP_PASSWORD>";
+
+    void ApriFileRequest()
+    {
+        if (string.IsNullOrWhiteSpace(fileRequestUrl))
+            return;
+
+        // Apre OneDrive File Request in una nuova scheda
+        Nav.NavigateTo(fileRequestUrl, forceLoad: true);
+    }
+
+    void ApriNextcloudFileDrop()
+    {
+        if (string.IsNullOrWhiteSpace(nextcloudFileDropUrl))
+            return;
+
+        // Apre Nextcloud File Drop in una nuova scheda
+        Nav.NavigateTo(nextcloudFileDropUrl, forceLoad: true);
+    }
+
+    void VaiAllaPaginaNextcloudUpload()
+    {
+        // Naviga alla tua pagina interna che fa upload via WebDAV
+        Nav.NavigateTo("/nextcloud-upload");
+    }
+}
+
 
 
 
