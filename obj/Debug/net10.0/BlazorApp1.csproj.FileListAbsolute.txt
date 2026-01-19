@@ -207,6 +207,9 @@ C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\icudt_CJK.tjcz0u77k5.dat
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\icudt_EFIGS.tptq2av103.dat
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\icudt_no_CJK.lfu7j35m59.dat
+C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\BlazorApp1.zbw84q2jsl.wasm
+C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\BlazorApp1.lxvx5wydvz.pdb
+C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\dotnet.1vhfufbxqy.js
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\blazor.webassembly.66stpp682q.js.gz
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\Microsoft.AspNetCore.Authorization.1l4onz0xjo.wasm.gz
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\Microsoft.AspNetCore.Components.nyb7ae3bsc.wasm.gz
@@ -415,6 +418,9 @@ C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\icudt_CJK.tjcz0u77k5.dat.gz
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\icudt_EFIGS.tptq2av103.dat.gz
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\icudt_no_CJK.lfu7j35m59.dat.gz
+C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\BlazorApp1.zbw84q2jsl.wasm.gz
+C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\BlazorApp1.lxvx5wydvz.pdb.gz
+C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\dotnet.1vhfufbxqy.js.gz
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\BlazorApp1.staticwebassets.runtime.json
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\BlazorApp1.staticwebassets.endpoints.json
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\BlazorApp1.dll
@@ -636,6 +642,7 @@ C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\BlazorApp1.AssemblyInfo.cs
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\BlazorApp1.csproj.CoreCompileInputs.cache
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\BlazorApp1.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\BlazorApp1.sourcelink.json
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\webcil\Microsoft.AspNetCore.Authorization.wasm
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\webcil\Microsoft.AspNetCore.Components.wasm
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\webcil\Microsoft.AspNetCore.Components.Forms.wasm
@@ -848,6 +855,8 @@ C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\dotnet.js
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\staticwebassets\htmlassetplaceholders\build\fwvdb8mw7z.html
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\compressed\f9o902iofb-{0}-99zm1jdh75-99zm1jdh75.gz
+C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\compressed\0mxugrztps-{0}-sxtkiodsj7-sxtkiodsj7.gz
+C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\compressed\r4wioeramg-{0}-e9hdql3doh-e9hdql3doh.gz
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\compressed\cs6axe170x-{0}-nk9bgqz024-nk9bgqz024.gz
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\compressed\tfhfj4k1eg-{0}-bqjiyaj88i-bqjiyaj88i.gz
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\compressed\gcsaolbtag-{0}-c2jlpeoesf-c2jlpeoesf.gz
@@ -1104,6 +1113,10 @@ C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\compressed\wrnfiqcclm-{0}-tjcz0u77k5-tjcz0u77k5.gz
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\compressed\m2waow3ayo-{0}-tptq2av103-tptq2av103.gz
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\compressed\yvizlwgna6-{0}-lfu7j35m59-lfu7j35m59.gz
+C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\compressed\mpnezo3ggr-{0}-zbw84q2jsl-zbw84q2jsl.gz
+C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\compressed\kyjy2iuvp1-{0}-lxvx5wydvz-lxvx5wydvz.gz
+C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\compressed\tsdf2s09qm-{0}-1vhfufbxqy-1vhfufbxqy.gz
+C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\compressed\1wemzayru4-{0}-rlzy29iqoa-rlzy29iqoa.gz
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\staticwebassets.build.json
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\staticwebassets.build.json.cache
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\staticwebassets.development.json
@@ -1115,16 +1128,3 @@ C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\refint\BlazorApp1.dll
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\BlazorApp1.pdb
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\ref\BlazorApp1.dll
-C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\BlazorApp1.sourcelink.json
-C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\compressed\0mxugrztps-{0}-sxtkiodsj7-sxtkiodsj7.gz
-C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\compressed\r4wioeramg-{0}-e9hdql3doh-e9hdql3doh.gz
-C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\BlazorApp1.1qwi7tb9wg.wasm
-C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\BlazorApp1.ftizff6o9d.pdb
-C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\dotnet.vshdgj5wf1.js
-C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\BlazorApp1.1qwi7tb9wg.wasm.gz
-C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\BlazorApp1.ftizff6o9d.pdb.gz
-C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\bin\Debug\net10.0\wwwroot\_framework\dotnet.vshdgj5wf1.js.gz
-C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\compressed\mpnezo3ggr-{0}-1qwi7tb9wg-1qwi7tb9wg.gz
-C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\compressed\kyjy2iuvp1-{0}-ftizff6o9d-ftizff6o9d.gz
-C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\compressed\tsdf2s09qm-{0}-vshdgj5wf1-vshdgj5wf1.gz
-C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\obj\Debug\net10.0\compressed\1wemzayru4-{0}-d2v2w3fdki-d2v2w3fdki.gz
