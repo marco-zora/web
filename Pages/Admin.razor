@@ -9,11 +9,36 @@
     <p class="text-danger">@Error</p>
 }
 
-<button class="btn btn-primary mb-3" @onclick="LoadUsers">Ricarica utenti</button>
+@if (!Loaded)
+{
+    <p>Caricamento utenti...</p>
+    @* Fermiamo qui finché non abbiamo letto users.json *@
+    return;
+}
+
+@if (RequiresAdminLogin)
+{
+    <div class="card p-3 mb-3" style="max-width: 350px;">
+        <h5>Accesso Admin</h5>
+
+        @if (!string.IsNullOrEmpty(AdminError))
+        {
+            <p class="text-danger">@AdminError</p>
+        }
+
+        <input class="form-control mb-2" placeholder="Admin username" @bind="AdminUser" />
+        <input class="form-control mb-3" type="password" placeholder="Password" @bind="AdminPass" />
+
+        <button class="btn btn-primary" @onclick="VerifyAdminLogin">Entra</button>
+    </div>
+
+    @* Non mostriamo la pagina finché non c’è un login admin valido *@
+    return;
+}
 
 @if (Users is null)
 {
-    <p>Caricamento...</p>
+    <p>Nessun file users.json trovato.</p>
 }
 else
 {
@@ -21,7 +46,8 @@ else
         <thead>
             <tr>
                 <th>Username</th>
-                <th>Hash Password</th>
+                <th>Hash</th>
+                <th>Ruolo</th>
                 <th class="text-end">Azioni</th>
             </tr>
         </thead>
@@ -31,10 +57,9 @@ else
                 <tr>
                     <td>@u.user</td>
                     <td>@u.hash</td>
+                    <td>@u.role</td>
                     <td class="text-end">
-                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteUser(u.user)">
-                            Elimina
-                        </button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteUser(u.user)">Elimina</button>
                     </td>
                 </tr>
             }
@@ -45,21 +70,23 @@ else
 
     <h5>Aggiungi nuovo utente</h5>
 
-    <div class="row g-2" style="max-width: 400px;">
+    <div class="row g-2" style="max-width: 450px;">
         <div class="col">
             <input class="form-control" placeholder="Username" @bind="NewUser" />
         </div>
         <div class="col">
             <input class="form-control" placeholder="Password" type="password" @bind="NewPass" />
         </div>
+        <div class="col">
+            <select class="form-select" @bind="NewRole">
+                <option value="user">user</option>
+                <option value="admin">admin</option>
+            </select>
+        </div>
         <div class="col-auto">
             <button class="btn btn-success" @onclick="AddUser">Aggiungi</button>
         </div>
     </div>
-
-    <p class="text-muted mt-2">
-        La password viene salvata come SHA-256, non in chiaro.
-    </p>
 
     <button class="btn btn-primary mt-3" @onclick="SaveUsers">
         Salva su Nextcloud
@@ -70,14 +97,28 @@ else
     private string ProxyBase = "https://first.marcomaria-zora.workers.dev/api/dav/UPLOADS/";
     private string FileName = "users.json";
 
-    private class UserRecord { public string user { get; set; } = ""; public string hash { get; set; } = ""; }
+    private class UserRecord
+    {
+        public string user { get; set; } = "";
+        public string hash { get; set; } = "";
+        public string role { get; set; } = "user";
+    }
 
     private List<UserRecord>? Users;
+    private bool Loaded = false;
+
+    // Stato login admin
+    private bool RequiresAdminLogin = false;
+    private bool AdminLogged = false;
+    private string? AdminUser;
+    private string? AdminPass;
+    private string? AdminError;
+
     private string? NewUser;
     private string? NewPass;
+    private string NewRole = "user";
     private string? Error;
 
-    // === SHA256 helper ===
     private static string Sha256(string input)
     {
         using var sha = System.Security.Cryptography.SHA256.Create();
@@ -85,8 +126,23 @@ else
         return Convert.ToHexString(bytes).ToLower();
     }
 
-    // === LOAD USERS ===
-    private async Task LoadUsers()
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsersFromServer();
+        Loaded = true;
+
+        if (Users != null && Users.Any(u => u.role == "admin"))
+        {
+            RequiresAdminLogin = true;
+        }
+        else
+        {
+            // nessun admin definito → libero accesso
+            RequiresAdminLogin = false;
+        }
+    }
+
+    private async Task LoadUsersFromServer()
     {
         try
         {
@@ -95,11 +151,42 @@ else
         }
         catch (Exception ex)
         {
-            Error = "Errore caricamento utenti: " + ex.Message;
+            Error = "Errore lettura utenti: " + ex.Message;
         }
     }
 
-    // === ADD USER ===
+    private async Task VerifyAdminLogin()
+    {
+        if (Users is null)
+        {
+            AdminError = "Impossibile caricare utenti.";
+            return;
+        }
+
+        if (string.IsNullOrEmpty(AdminUser) || string.IsNullOrEmpty(AdminPass))
+        {
+            AdminError = "Inserisci username e password.";
+            return;
+        }
+
+        string hash = Sha256(AdminPass);
+
+        var admin = Users.FirstOrDefault(u => u.user == AdminUser && u.hash == hash && u.role == "admin");
+
+        if (admin is null)
+        {
+            AdminError = "Credenziali admin non valide.";
+            return;
+        }
+
+        // OK, admin verificato
+        RequiresAdminLogin = false;
+        AdminError = null;
+
+        // Mostriamo la pagina
+        StateHasChanged();
+    }
+
     private void AddUser()
     {
         if (string.IsNullOrWhiteSpace(NewUser) || string.IsNullOrWhiteSpace(NewPass))
@@ -117,14 +204,15 @@ else
         Users.Add(new UserRecord
         {
             user = NewUser.Trim(),
-            hash = Sha256(NewPass.Trim())
+            hash = Sha256(NewPass.Trim()),
+            role = NewRole
         });
 
         NewUser = "";
         NewPass = "";
+        NewRole = "user";
     }
 
-    // === DELETE USER ===
     private void DeleteUser(string username)
     {
         var u = Users?.FirstOrDefault(x => x.user == username);
@@ -132,7 +220,6 @@ else
             Users.Remove(u);
     }
 
-    // === SAVE USERS (PUT DAV) ===
     private async Task SaveUsers()
     {
         try
@@ -148,22 +235,13 @@ else
             var res = await Http.PutAsync(ProxyBase + FileName, content);
 
             if (!res.IsSuccessStatusCode)
-            {
                 Error = $"Errore salvataggio: {res.StatusCode}";
-            }
             else
-            {
                 await JS.InvokeVoidAsync("alert", "Utenti salvati con successo!");
-            }
         }
         catch (Exception ex)
         {
             Error = "Errore: " + ex.Message;
         }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadUsers();
     }
 }
