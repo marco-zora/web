@@ -1,0 +1,169 @@
+﻿@page "/admin-users"
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<h3>Gestione utenti</h3>
+
+@if (Error is not null)
+{
+    <p class="text-danger">@Error</p>
+}
+
+<button class="btn btn-primary mb-3" @onclick="LoadUsers">Ricarica utenti</button>
+
+@if (Users is null)
+{
+    <p>Caricamento...</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Hash Password</th>
+                <th class="text-end">Azioni</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Users)
+            {
+                <tr>
+                    <td>@u.user</td>
+                    <td>@u.hash</td>
+                    <td class="text-end">
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteUser(u.user)">
+                            Elimina
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <hr />
+
+    <h5>Aggiungi nuovo utente</h5>
+
+    <div class="row g-2" style="max-width: 400px;">
+        <div class="col">
+            <input class="form-control" placeholder="Username" @bind="NewUser" />
+        </div>
+        <div class="col">
+            <input class="form-control" placeholder="Password" type="password" @bind="NewPass" />
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-success" @onclick="AddUser">Aggiungi</button>
+        </div>
+    </div>
+
+    <p class="text-muted mt-2">
+        La password viene salvata come SHA-256, non in chiaro.
+    </p>
+
+    <button class="btn btn-primary mt-3" @onclick="SaveUsers">
+        Salva su Nextcloud
+    </button>
+}
+
+@code {
+    private string ProxyBase = "https://first.marcomaria-zora.workers.dev/api/dav/UPLOADS/";
+    private string FileName = "users.json";
+
+    private class UserRecord { public string user { get; set; } = ""; public string hash { get; set; } = ""; }
+
+    private List<UserRecord>? Users;
+    private string? NewUser;
+    private string? NewPass;
+    private string? Error;
+
+    // === SHA256 helper ===
+    private static string Sha256(string input)
+    {
+        using var sha = System.Security.Cryptography.SHA256.Create();
+        var bytes = sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(input));
+        return Convert.ToHexString(bytes).ToLower();
+    }
+
+    // === LOAD USERS ===
+    private async Task LoadUsers()
+    {
+        try
+        {
+            Error = null;
+            Users = await Http.GetFromJsonAsync<List<UserRecord>>(ProxyBase + FileName);
+        }
+        catch (Exception ex)
+        {
+            Error = "Errore caricamento utenti: " + ex.Message;
+        }
+    }
+
+    // === ADD USER ===
+    private void AddUser()
+    {
+        if (string.IsNullOrWhiteSpace(NewUser) || string.IsNullOrWhiteSpace(NewPass))
+        {
+            Error = "Inserisci username e password.";
+            return;
+        }
+
+        if (Users!.Any(u => u.user == NewUser))
+        {
+            Error = "Utente già esistente.";
+            return;
+        }
+
+        Users.Add(new UserRecord
+        {
+            user = NewUser.Trim(),
+            hash = Sha256(NewPass.Trim())
+        });
+
+        NewUser = "";
+        NewPass = "";
+    }
+
+    // === DELETE USER ===
+    private void DeleteUser(string username)
+    {
+        var u = Users?.FirstOrDefault(x => x.user == username);
+        if (u != null)
+            Users.Remove(u);
+    }
+
+    // === SAVE USERS (PUT DAV) ===
+    private async Task SaveUsers()
+    {
+        try
+        {
+            Error = null;
+
+            var json = System.Text.Json.JsonSerializer.Serialize(
+                Users,
+                new System.Text.Json.JsonSerializerOptions { WriteIndented = true }
+            );
+
+            using var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            var res = await Http.PutAsync(ProxyBase + FileName, content);
+
+            if (!res.IsSuccessStatusCode)
+            {
+                Error = $"Errore salvataggio: {res.StatusCode}";
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("alert", "Utenti salvati con successo!");
+            }
+        }
+        catch (Exception ex)
+        {
+            Error = "Errore: " + ex.Message;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+    }
+}
