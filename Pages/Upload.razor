@@ -1,9 +1,11 @@
 ﻿
+
 @page "/upload"
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Text
 @using System.Xml.Linq
 @using System.Net.Http.Headers
+@implements IAsyncDisposable
 @inject NavigationManager Nav
 @inject HttpClient Http
 @inject IJSRuntime JS
@@ -26,10 +28,23 @@
 <hr />
 
 <!-- Barra strumenti gestione -->
-<div class="d-flex align-items-center mb-2">
+<div class="d-flex align-items-center mb-2 gap-2">
     <button class="btn btn-outline-primary btn-sm" @onclick="RefreshListAsync">Aggiorna elenco</button>
-    <span class="ms-2 text-muted">@LastListRefreshText</span>
+    <span class="text-muted">@LastListRefreshText</span>
 </div>
+
+
+
+
+<!-- Toggle anteprime animate -->
+
+<input class="form-check-input" type="checkbox" id="toggle-animated"
+       @bind="AnimatedPreviews"
+       @bind:after="OnAnimatedChanged">
+<label class="form-check-label" for="toggle-animated">
+    Anteprime animate (riproduci video quando visibili)
+</label>
+
 
 @if (Loading)
 {
@@ -62,21 +77,26 @@ else
                 {
                     var isVid = IsVideo(it.ContentType, it.Name);
                     var fileUrl = FileUrl(it.Name);
+                    var vidId = $"vid_{Uri.EscapeDataString(it.Name)}"; // id stabile per observer
                     <tr>
                         <td>
                             @if (isVid)
                             {
-                                <video
-                                    muted
-                                    preload="metadata"
-                                    playsinline
-                                    style="width:130px; height:74px; border-radius:6px; background:#000; object-fit:cover;">
-                                    <source src="@fileUrl" type="@(it.ContentType ?? "video/mp4")" />
+                                <!-- Miniatura statica: NESSUN autoplay; decide JS in base alla visibilità -->
+                                <video id="@vidId"
+                                       data-preview="1"
+                                       muted
+                                       playsinline
+                                       loop
+                                       preload="metadata"
+                                       src="@fileUrl"
+                                       style="width:130px; height:74px; border-radius:6px; background:#000; object-fit:cover;">
                                     Il tuo browser non supporta il video.
                                 </video>
                             }
                             else
                             {
+                                <!-- Placeholder per non-video -->
                                 <div class="d-flex align-items-center justify-content-center"
                                      style="width:130px; height:74px; border:1px solid #e0e0e0; border-radius:6px; color:#999;">
                                     —
@@ -100,7 +120,6 @@ else
 }
 
 <!-- Modal Viewer -->
-<!-- Modal Viewer -->
 @if (ShowViewer && SelectedItem is not null)
 {
     <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.55);">
@@ -117,8 +136,8 @@ else
                 <div class="modal-body">
                     @if (IsVideo(SelectedItem.ContentType, SelectedItem.Name))
                     {
-                        <video controls autoplay playsinline style="width:100%; max-height:70vh; background:#000;">
-                            <source src="@FileUrl(SelectedItem.Name)" type="@SelectedItem.ContentType" />
+                        <video controls autoplay playsinline style="width:100%; max-height:70vh; background:#000;"
+                               src="@FileUrl(SelectedItem.Name)">
                             Il tuo browser non supporta il video.
                         </video>
                     }
@@ -126,7 +145,7 @@ else
                     {
                         <div class="alert alert-info">
                             Questo file non è un video.
-                            <a href="@FileUrl(SelectedItem.Name)" target="_blank">Aprilo in una nuova scheda</a>.
+                            <a class="alert-link" href="@FileUrl(SelectedItem.Name)" target="_blank" rel="noopener">Aprilo in una nuova scheda</a>.
                         </div>
                     }
                 </div>
@@ -134,7 +153,7 @@ else
                 <!-- FOOTER -->
                 <div class="modal-footer">
                     <button class="btn btn-secondary" @onclick="CloseViewer">Chiudi</button>
-                    <a class="btn btn-primary" href="@FileUrl(SelectedItem.Name)" target="_blank">
+                    <a class="btn btn-outline-primary" href="@FileUrl(SelectedItem.Name)" target="_blank" rel="noopener">
                         Apri in nuova scheda
                     </a>
                 </div>
@@ -143,8 +162,6 @@ else
         </div>
     </div>
 }
-
-
 
 @code {
     // === OneDrive ===
@@ -182,7 +199,7 @@ else
             try
             {
                 var url = new Uri(ProxyBase + "UPLOADS/" + Uri.EscapeDataString(file.Name));
-                using var stream = file.OpenReadStream(long.MaxValue);
+                using var stream = file.OpenReadStream(long.MaxValue); // valuta chunk+progress in futuro
                 using var content = new StreamContent(stream);
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
 
@@ -212,6 +229,7 @@ else
         {
             var url = new Uri(ProxyBase + "UPLOADS/");
 
+            // XML reale + MIME corretto + getcontenttype
             const string body = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <d:propfind xmlns:d=""DAV:"">
   <d:prop>
@@ -264,43 +282,53 @@ else
             if (string.IsNullOrWhiteSpace(href))
                 continue;
 
+            // Scegliamo il propstat 200 OK
             var propstat = resp.Elements(d + "propstat")
                                .FirstOrDefault(ps =>
                                    (string?)ps.Element(d + "status") != null &&
                                    ps.Element(d + "status")!.Value.Contains("200"));
+
             if (propstat == null) continue;
 
             var prop = propstat.Element(d + "prop");
             if (prop == null) continue;
 
+            // Nome dal displayname o dall'href
             var displayName = prop.Element(d + "displayname")?.Value ?? "";
             var decodedHref = Uri.UnescapeDataString(href);
             var nameFromHref = decodedHref.TrimEnd('/')
                                           .Split('/', StringSplitOptions.RemoveEmptyEntries)
                                           .LastOrDefault() ?? "";
+
             var name = string.IsNullOrWhiteSpace(displayName) ? nameFromHref : displayName;
 
+            // Cartelle (collection) → saltate
             var isCollection = prop.Element(d + "resourcetype")?.Element(d + "collection") != null;
             if (isCollection) continue;
 
+            // Dimensione
             long size = 0;
             var sizeStr = prop.Element(d + "getcontentlength")?.Value;
             if (!string.IsNullOrWhiteSpace(sizeStr))
                 long.TryParse(sizeStr, out size);
 
+            // Ultima modifica
             DateTimeOffset? lm = null;
             var lmStr = prop.Element(d + "getlastmodified")?.Value;
             if (!string.IsNullOrWhiteSpace(lmStr) && DateTimeOffset.TryParse(lmStr, out var lmv))
                 lm = lmv;
 
+            // Content-Type
             var ctype = prop.Element(d + "getcontenttype")?.Value;
 
+            // Evita la voce radice
             if (string.IsNullOrWhiteSpace(name) || name.Equals("UPLOADS", StringComparison.OrdinalIgnoreCase))
                 continue;
 
             list.Add(new DavItem(name, IsFile: true, Size: size, LastModified: lm, ContentType: ctype));
         }
 
+        // Ordina per data discendente
         return list.OrderByDescending(i => i.LastModified).ToList();
     }
 
@@ -335,6 +363,7 @@ else
         var newName = await JS.InvokeAsync<string?>("prompt", $"Nuovo nome per '{oldName}':", oldName);
         if (string.IsNullOrWhiteSpace(newName) || newName == oldName) return;
 
+        // Sanitizzazione minima
         newName = newName.Trim();
         if (newName.Contains('/') || newName.Contains('\\') || newName.Contains(".."))
         {
@@ -365,11 +394,12 @@ else
         }
     }
 
-    // ===== Viewer / Helpers ====
+    // ===== Helpers / Viewer =====
     private static bool IsVideo(string? contentType, string name)
     {
         if (!string.IsNullOrEmpty(contentType) && contentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase))
             return true;
+
         var ext = System.IO.Path.GetExtension(name).ToLowerInvariant();
         return ext is ".mp4" or ".webm" or ".ogg" or ".mov" or ".m4v";
     }
@@ -393,6 +423,28 @@ else
         SelectedItem = null;
     }
 
+    // ===== Anteprime animate (JS interop) =====
+    private bool AnimatedPreviews = false;
+
+    private async Task OnAnimatedChanged()
+        => await JS.InvokeVoidAsync("previewObserver.setAnimated", AnimatedPreviews);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("previewObserver.init");
+        }
+        // Scansiona ad ogni render: registra i nuovi <video data-preview="1">
+        await JS.InvokeVoidAsync("previewObserver.scan");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try { await JS.InvokeVoidAsync("previewObserver.dispose"); }
+        catch { /* ignore on dispose */ }
+    }
+
     // ===== Utilità ====
     private static string FormatSize(long bytes)
     {
@@ -408,3 +460,4 @@ else
     // Carica lista iniziale alla prima apertura
     protected override async Task OnInitializedAsync() => await RefreshListAsync();
 }
+
