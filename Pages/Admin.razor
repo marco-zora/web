@@ -1,67 +1,22 @@
 ﻿@page "/admin"
-@inject HttpClient Http
-@inject IJSRuntime JS
-
-<h3>Gestione utenti</h3>
-
-@if (Error is not null)
-{
-    <p class="text-danger">@Error</p>
-}
-
-
-
 @inject IJSRuntime JS
 @inject NavigationManager Nav
+@inject HttpClient Http
 
-@code {
-    protected override async Task OnInitializedAsync()
-    {
-        var role = await JS.InvokeAsync<string>("sessionStorage.getItem", "loggedRole");
-
-        if (role != "admin")
-        {
-            Nav.NavigateTo("/login");
-            return;
-        }
-    }
-}
-
-
+<h3>Gestione utenti</h3>
 
 @if (!Loaded)
 {
     <p>Caricamento utenti...</p>
-    @* Fermiamo qui finché non abbiamo letto users.json *@
     return;
 }
 
-
-
-
-
-
-@if (RequiresAdminLogin)
+@if (!string.IsNullOrEmpty(Error))
 {
-    <div class="card p-3 mb-3" style="max-width: 350px;">
-        <h5>Accesso Admin</h5>
-
-        @if (!string.IsNullOrEmpty(AdminError))
-        {
-            <p class="text-danger">@AdminError</p>
-        }
-
-        <input class="form-control mb-2" placeholder="Admin username" @bind="AdminUser" />
-        <input class="form-control mb-3" type="password" placeholder="Password" @bind="AdminPass" />
-
-        <button class="btn btn-primary" @onclick="VerifyAdminLogin">Entra</button>
-    </div>
-
-    @* Non mostriamo la pagina finché non c’è un login admin valido *@
-    return;
+    <p class="text-danger">@Error</p>
 }
 
-@if (Users is null)
+@if (Users is null || Users.Count == 0)
 {
     <p>Nessun file users.json trovato.</p>
 }
@@ -131,40 +86,31 @@ else
 
     private List<UserRecord>? Users;
     private bool Loaded = false;
-
-    // Stato login admin
-    private bool RequiresAdminLogin = false;
-    private bool AdminLogged = false;
-    private string? AdminUser;
-    private string? AdminPass;
-    private string? AdminError;
+    private string? Error;
 
     private string? NewUser;
     private string? NewPass;
     private string NewRole = "user";
-    private string? Error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Gate: solo admin
+        var role = await JS.InvokeAsync<string>("sessionStorage.getItem", "loggedRole");
+        if (!string.Equals(role, "admin", StringComparison.Ordinal))
+        {
+            Nav.NavigateTo("/login");
+            return;
+        }
+
+        await LoadUsersFromServer();
+        Loaded = true;
+    }
 
     private static string Sha256(string input)
     {
         using var sha = System.Security.Cryptography.SHA256.Create();
         var bytes = sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(input));
-        return Convert.ToHexString(bytes).ToLower();
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadUsersFromServer();
-        Loaded = true;
-
-        if (Users != null && Users.Any(u => u.role == "admin"))
-        {
-            RequiresAdminLogin = true;
-        }
-        else
-        {
-            // nessun admin definito → libero accesso
-            RequiresAdminLogin = false;
-        }
+        return Convert.ToHexString(bytes).ToLowerInvariant();
     }
 
     private async Task LoadUsersFromServer()
@@ -173,43 +119,13 @@ else
         {
             Error = null;
             Users = await Http.GetFromJsonAsync<List<UserRecord>>(ProxyBase + FileName);
+            Users ??= new(); // evita null refs
         }
         catch (Exception ex)
         {
             Error = "Errore lettura utenti: " + ex.Message;
+            Users = new();
         }
-    }
-
-    private async Task VerifyAdminLogin()
-    {
-        if (Users is null)
-        {
-            AdminError = "Impossibile caricare utenti.";
-            return;
-        }
-
-        if (string.IsNullOrEmpty(AdminUser) || string.IsNullOrEmpty(AdminPass))
-        {
-            AdminError = "Inserisci username e password.";
-            return;
-        }
-
-        string hash = Sha256(AdminPass);
-
-        var admin = Users.FirstOrDefault(u => u.user == AdminUser && u.hash == hash && u.role == "admin");
-
-        if (admin is null)
-        {
-            AdminError = "Credenziali admin non valide.";
-            return;
-        }
-
-        // OK, admin verificato
-        RequiresAdminLogin = false;
-        AdminError = null;
-
-        // Mostriamo la pagina
-        StateHasChanged();
     }
 
     private void AddUser()
@@ -220,7 +136,8 @@ else
             return;
         }
 
-        if (Users!.Any(u => u.user == NewUser))
+        Users ??= new();
+        if (Users.Any(u => u.user == NewUser))
         {
             Error = "Utente già esistente.";
             return;
@@ -240,9 +157,9 @@ else
 
     private void DeleteUser(string username)
     {
-        var u = Users?.FirstOrDefault(x => x.user == username);
-        if (u != null)
-            Users.Remove(u);
+        if (Users is null) return;
+        var u = Users.FirstOrDefault(x => x.user == username);
+        if (u is not null) Users.Remove(u);
     }
 
     private async Task SaveUsers()
@@ -250,6 +167,7 @@ else
         try
         {
             Error = null;
+            Users ??= new();
 
             var json = System.Text.Json.JsonSerializer.Serialize(
                 Users,
