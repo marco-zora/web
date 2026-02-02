@@ -28,6 +28,28 @@
         <label class="form-label">Indirizzo</label>
         <input class="form-control mb-3" @bind="Impianto!.indirizzo" @bind:event="oninput" />
 
+
+
+        <label class="form-label">Colore card</label>
+        <div class="d-flex align-items-center gap-3 mb-3">
+
+            <!-- Color picker HTML nativo -->
+            <input type="color"
+                   class="form-control form-control-color"
+                   style="width: 3rem; height: 3rem; padding:0;"
+                   @bind="Impianto!.colore"
+                   @bind:event="oninput" />
+
+            <!-- Input testuale per chi vuole incollare un hex a mano -->
+            <input class="form-control"
+                   style="max-width: 160px;"
+                   placeholder="#e3f2fd"
+                   @bind="Impianto!.colore"
+                   @bind:event="oninput" />
+        </div>
+
+
+
         <button class="btn btn-primary" @onclick="Save">
             Salva Modifiche
         </button>
