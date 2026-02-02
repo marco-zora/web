@@ -83,21 +83,26 @@
 
                                 <div class="card-footer bg-transparent d-flex justify-content-between">
 
-                                    <button class="btn btn-sm btn-outline-primary bg-white bg-opacity-75"
+                                    <button class="btn btn-sm btn-outline-primary
+                                   bg-white bg-opacity-75 px-3"
                                             @onclick="() => ApriDettaglio(cliente, imp)">
                                         <i class="bi bi-search"></i> Dettaglio
                                     </button>
 
-                                    <span>
-                                        <button class="btn btn-sm btn-outline-primary me-2 bg-white bg-opacity-75"
+                                    <span class="d-flex">
+
+                                        <button class="btn btn-sm btn-outline-primary
+                                       bg-white bg-opacity-75 me-2 px-2"
                                                 @onclick="() => RenameImpianto(cliente, imp)">
                                             <i class="bi bi-pencil"></i>
                                         </button>
 
-                                        <button class="btn btn-sm btn-outline-danger bg-white bg-opacity-75"
+                                        <button class="btn btn-sm btn-outline-danger
+                                       bg-white bg-opacity-75 px-2"
                                                 @onclick="() => DeleteImpianto(cliente, imp)">
                                             <i class="bi bi-trash"></i>
                                         </button>
+
                                     </span>
 
                                 </div>
