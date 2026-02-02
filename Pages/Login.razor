@@ -1,0 +1,102 @@
+﻿@page "/login"
+@inject HttpClient Http
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+
+<h3>Accesso</h3>
+
+@if (!Loaded)
+{
+    <p>Caricamento utenti...</p>
+    return;
+}
+
+@if (!string.IsNullOrEmpty(LoginError))
+{
+    <p class="text-danger">@LoginError</p>
+}
+
+<div class="card p-3 mb-3" style="max-width: 350px;">
+    <input class="form-control mb-2" placeholder="Username" @bind="LoginUser" />
+    <input class="form-control mb-3" type="password" placeholder="Password" @bind="LoginPass" />
+
+    <button class="btn btn-primary w-100" @onclick="VerifyLogin">Entra</button>
+</div>
+
+@code {
+    private string ProxyBase = "https://first.marcomaria-zora.workers.dev/api/dav/UPLOADS/";
+    private string FileName = "users.json";
+
+    private class UserRecord
+    {
+        public string user { get; set; } = "";
+        public string hash { get; set; } = "";
+        public string role { get; set; } = "user";
+    }
+
+    private List<UserRecord>? Users;
+    private bool Loaded = false;
+
+    private string? LoginUser;
+    private string? LoginPass;
+    private string? LoginError;
+
+    private static string Sha256(string input)
+    {
+        using var sha = System.Security.Cryptography.SHA256.Create();
+        var bytes = sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(input));
+        return Convert.ToHexString(bytes).ToLower();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Users = await Http.GetFromJsonAsync<List<UserRecord>>(ProxyBase + FileName);
+        }
+        catch
+        {
+            Users = null;
+        }
+
+        Loaded = true;
+    }
+
+    private async Task VerifyLogin()
+    {
+        if (Users is null)
+        {
+            LoginError = "Impossibile leggere utenti.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(LoginUser) || string.IsNullOrWhiteSpace(LoginPass))
+        {
+            LoginError = "Inserisci username e password.";
+            return;
+        }
+
+        string hash = Sha256(LoginPass);
+
+        var match = Users.FirstOrDefault(u =>
+            u.user == LoginUser &&
+            u.hash == hash
+        );
+
+        if (match is null)
+        {
+            LoginError = "Credenziali non valide.";
+            return;
+        }
+
+        // Login OK → salviamo in memoria (localStorage o sessionStorage)
+        await JS.InvokeVoidAsync("sessionStorage.setItem", "loggedUser", match.user);
+        await JS.InvokeVoidAsync("sessionStorage.setItem", "loggedRole", match.role);
+
+        // Routing in base al ruolo
+        if (match.role == "admin")
+            Nav.NavigateTo("/admin");       // <- la ex pagina Admin
+        else
+            Nav.NavigateTo("/upload");       // <- per i semplici user
+    }
+}

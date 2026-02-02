@@ -9,12 +9,37 @@
     <p class="text-danger">@Error</p>
 }
 
+
+
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var role = await JS.InvokeAsync<string>("sessionStorage.getItem", "loggedRole");
+
+        if (role != "admin")
+        {
+            Nav.NavigateTo("/login");
+            return;
+        }
+    }
+}
+
+
+
 @if (!Loaded)
 {
     <p>Caricamento utenti...</p>
     @* Fermiamo qui finché non abbiamo letto users.json *@
     return;
 }
+
+
+
+
+
 
 @if (RequiresAdminLogin)
 {

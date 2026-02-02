@@ -12,6 +12,26 @@
 
 <h3>Carica i tuoi file</h3>
 
+
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await JS.InvokeAsync<string>("sessionStorage.getItem", "loggedUser");
+
+        if (string.IsNullOrEmpty(user))
+        {
+            Nav.NavigateTo("/login");
+            return;
+        }
+    }
+}
+
+
+
+
 <!-- Pulsante OneDrive -->
 <button class="btn btn-primary" @onclick="ApriOneDrive">
     Carica su OneDrive (File Request)
