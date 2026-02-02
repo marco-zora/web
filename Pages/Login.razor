@@ -78,7 +78,7 @@
         await JS.InvokeVoidAsync("sessionStorage.setItem", "loggedUser", match.user);
         await JS.InvokeVoidAsync("sessionStorage.setItem", "loggedRole", match.role);
 
-        if (match.role == "admin") Nav.NavigateTo("/admin");
-        else Nav.NavigateTo("/upload");
+        if (match.role == "admin") Nav.NavigateTo("/web/admin");
+        else Nav.NavigateTo("/web/upload");
     }
 }
