@@ -11,11 +11,13 @@
 
 <h3>Carica i tuoi file</h3>
 
-<!-- WELCOME -->
-<div class="alert alert-info">
-    Utente collegato: <strong>@LoggedUser</strong>
-</div>
-
+@if (!string.IsNullOrWhiteSpace(LoggedUser))
+{
+    <div class="alert alert-info py-2 mb-3">
+        Utente collegato: <strong>@LoggedUser</strong>
+        <span class="ms-3 text-muted">Path corrente: <code>@UserBasePath</code></span>
+    </div>
+}
 
 <!-- Pulsante OneDrive -->
 <button class="btn btn-primary" @onclick="ApriOneDrive">
@@ -39,12 +41,14 @@
 </div>
 
 <!-- Toggle anteprime animate -->
-<input class="form-check-input" type="checkbox" id="toggle-animated"
-       @bind="AnimatedPreviews"
-       @bind:after="OnAnimatedChanged">
-<label class="form-check-label" for="toggle-animated">
-    Anteprime animate (riproduci video quando visibili)
-</label>
+<div class="form-check form-switch mb-3">
+    <input class="form-check-input" type="checkbox" id="toggle-animated"
+           @bind="AnimatedPreviews"
+           @bind:after="OnAnimatedChanged">
+    <label class="form-check-label" for="toggle-animated">
+        Anteprime animate (riproduci video quando visibili)
+    </label>
+</div>
 
 @if (Loading)
 {
@@ -58,7 +62,7 @@ else
 {
     @if (Items.Count == 0)
     {
-        <p>Nessun file in <code>UPLOADS</code>.</p>
+        <p>Nessun file in <code>@UserBasePath</code>.</p>
     }
     else
     {
@@ -82,7 +86,7 @@ else
                                                                             <td>
                             @if (isVid)
                             {
-                                <!-- Miniatura statica: NESSUN autoplay; decide JS in base alla visibilità -->
+                                <!-- Miniatura: JS decide autoplay solo se visibile -->
                                 <video id="@vidId"
                                        data-preview="1"
                                        muted
@@ -164,17 +168,24 @@ else
 }
 
 @code {
-
-    // === WELCOME ===
-    private string? LoggedUser;
-
-    // === OneDrive ===
+    // === OneDrive (solo link) ===
     private string oneDriveFileRequestUrl =
         "https://cnrsc-my.sharepoint.com/:f:/g/personal/marcomaria_zora_cnr_it/IgBduHaMs9w8Rrv0sGzseFl0AdC6oy9w5_UP0wngjZvbgjQ";
     void ApriOneDrive() => Nav.NavigateTo(oneDriveFileRequestUrl, forceLoad: true);
 
     // === Nextcloud via Cloudflare Worker ===
+    // ⚠️ Tenere /api/dav/ e lo slash finale
     private string ProxyBase = "https://first.marcomaria-zora.workers.dev/api/dav/";
+
+    // --- Sessione/ruolo ---
+    private string? LoggedUser;
+    private string? LoggedRole;
+
+    // --- Percorsi dinamici ---
+    private const string RootCollection = "UPLOADS/";  // trailing slash
+    private string UserBasePath => string.Equals(LoggedRole, "admin", StringComparison.OrdinalIgnoreCase)
+        ? RootCollection
+        : $"{RootCollection}{Uri.EscapeDataString(LoggedUser!)}/";
 
     private string Status = "";
     private bool Loading = false;
@@ -185,18 +196,59 @@ else
     private List<DavItem> Items = new();
     private record DavItem(string Name, bool IsFile, long Size, DateTimeOffset? LastModified, string? ContentType);
 
-    // ======= INIT: login check + prima lista =======
+    // ======= INIT: login check + eventuale creazione cartella + prima lista =======
     protected override async Task OnInitializedAsync()
     {
         LoggedUser = await JS.InvokeAsync<string>("sessionStorage.getItem", "loggedUser");
+        LoggedRole = await JS.InvokeAsync<string>("sessionStorage.getItem", "loggedRole");
 
-        if (string.IsNullOrEmpty(LoggedUser))
+        if (string.IsNullOrWhiteSpace(LoggedUser))
         {
-            Nav.NavigateTo("login");
+            Nav.NavigateTo("login"); // percorso relativo → rispetta <base href="/web/">
             return;
         }
 
-        await RefreshListAsync(); // << usa il metodo esistente
+        // Se non admin, assicuriamo la cartella personale
+        if (!string.Equals(LoggedRole, "admin", StringComparison.OrdinalIgnoreCase))
+        {
+            await EnsureUserFolderAsync();
+        }
+
+        await RefreshListAsync();
+    }
+
+    private async Task EnsureUserFolderAsync()
+    {
+        try
+        {
+            var url = new Uri(ProxyBase + UserBasePath);
+
+            // PROPFIND Depth:0 per verificare se esiste
+            const string body = @"<?xml version=""1.0"" encoding=""utf-8""?>
+            <d:propfind xmlns:d=""DAV:"">
+              <d:prop><d:displayname/></d:prop>
+            </d:propfind>";
+
+            using var probeReq = new HttpRequestMessage(HttpMethod.Post, url);
+            probeReq.Headers.Add("X-Method-Override", "PROPFIND");
+            probeReq.Headers.Add("Depth", "0");
+            probeReq.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
+            probeReq.Content = new StringContent(body, Encoding.UTF8, "application/xml");
+
+            var probeRes = await Http.SendAsync(probeReq);
+            if (probeRes.IsSuccessStatusCode)
+                return; // esiste già
+
+            // Se non esiste, MKCOL
+            using var mkReq = new HttpRequestMessage(HttpMethod.Post, url);
+            mkReq.Headers.Add("X-Method-Override", "MKCOL");
+            var mkRes = await Http.SendAsync(mkReq);
+            // (opzionale: controlla mkRes.StatusCode per logging)
+        }
+        catch
+        {
+            // Non bloccare la pagina: al limite fallirà la lista con un messaggio
+        }
     }
 
     // ===== Upload (multipli) ====
@@ -214,8 +266,8 @@ else
         {
             try
             {
-                var url = new Uri(ProxyBase + "UPLOADS/" + Uri.EscapeDataString(file.Name));
-                using var stream = file.OpenReadStream(long.MaxValue);
+                var url = new Uri(ProxyBase + UserBasePath + Uri.EscapeDataString(file.Name));
+                using var stream = file.OpenReadStream(long.MaxValue); // valuta chunk+progress in futuro
                 using var content = new StreamContent(stream);
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
 
@@ -233,7 +285,7 @@ else
         else
             Status = $"Caricati: {ok}, Falliti: {ko}";
 
-        await RefreshListAsync();
+        await RefreshListAsync(); // aggiorna elenco
     }
 
     // ===== Lista (PROPFIND Depth:1) ====
@@ -243,18 +295,18 @@ else
         ListError = null;
         try
         {
-            var url = new Uri(ProxyBase + "UPLOADS/");
+            var url = new Uri(ProxyBase + UserBasePath);
 
             const string body = @"<?xml version=""1.0"" encoding=""utf-8""?>
-<d:propfind xmlns:d=""DAV:"">
-  <d:prop>
-    <d:displayname/>
-    <d:resourcetype/>
-    <d:getcontentlength/>
-    <d:getlastmodified/>
-    <d:getcontenttype/>
-  </d:prop>
-</d:propfind>";
+            <d:propfind xmlns:d=""DAV:"">
+              <d:prop>
+                <d:displayname/>
+                <d:resourcetype/>
+                <d:getcontentlength/>
+                <d:getlastmodified/>
+                <d:getcontenttype/>
+              </d:prop>
+            </d:propfind>";
 
             using var req = new HttpRequestMessage(HttpMethod.Post, url);
             req.Headers.Add("X-Method-Override", "PROPFIND");
@@ -271,7 +323,7 @@ else
             }
 
             var xml = await res.Content.ReadAsStringAsync();
-            Items = ParsePropfind(xml);
+            Items = ParsePropfind(xml, LoggedUser, LoggedRole);
             LastListRefreshText = $"(aggiornato alle {DateTime.Now:HH:mm:ss})";
         }
         catch (Exception ex)
@@ -285,7 +337,7 @@ else
         }
     }
 
-    private static List<DavItem> ParsePropfind(string xml)
+    private static List<DavItem> ParsePropfind(string xml, string? loggedUser, string? loggedRole)
     {
         var list = new List<DavItem>();
         var doc = XDocument.Parse(xml);
@@ -329,7 +381,11 @@ else
 
             var ctype = prop.Element(d + "getcontenttype")?.Value;
 
-            if (string.IsNullOrWhiteSpace(name) || name.Equals("UPLOADS", StringComparison.OrdinalIgnoreCase))
+            // Evita voce radice corrente (UPLOADS o UPLOADS/<user>)
+            if (string.IsNullOrWhiteSpace(name) ||
+                name.Equals("UPLOADS", StringComparison.OrdinalIgnoreCase) ||
+                (name.Equals(loggedUser, StringComparison.OrdinalIgnoreCase) &&
+                 !string.Equals(loggedRole, "admin", StringComparison.OrdinalIgnoreCase)))
                 continue;
 
             list.Add(new DavItem(name, IsFile: true, Size: size, LastModified: lm, ContentType: ctype));
@@ -367,6 +423,7 @@ else
         var newName = await JS.InvokeAsync<string?>("prompt", $"Nuovo nome per '{oldName}':", oldName);
         if (string.IsNullOrWhiteSpace(newName) || newName == oldName) return;
 
+        // Sanitizzazione minima
         newName = newName.Trim();
         if (newName.Contains('/') || newName.Contains('\\') || newName.Contains(".."))
         {
@@ -391,7 +448,6 @@ else
         }
         else
         {
-            var body = await res.Content.ReadAsStringAsync();
             Status = $"Errore rinomina {(int)res.StatusCode} {res.ReasonPhrase}";
         }
     }
@@ -406,7 +462,7 @@ else
     }
 
     private string FileUrl(string name)
-        => ProxyBase + "UPLOADS/" + Uri.EscapeDataString(name);
+        => ProxyBase + UserBasePath + Uri.EscapeDataString(name);
 
     private bool ShowViewer = false;
     private DavItem? SelectedItem = null;
@@ -436,6 +492,7 @@ else
         {
             await JS.InvokeVoidAsync("previewObserver.init");
         }
+        // Scansione ad ogni render: registra i nuovi <video data-preview="1">
         await JS.InvokeVoidAsync("previewObserver.scan");
     }
 
