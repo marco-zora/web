@@ -7,24 +7,8 @@
       "RelativeMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|solutionrelative:pages\\impianti.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|c:\\users\\marco\\onedrive - cnr\\zoratech\\visualstudio2026\\blazorapp1\\pages\\login.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|solutionrelative:pages\\login.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|c:\\users\\marco\\onedrive - cnr\\zoratech\\visualstudio2026\\blazorapp1\\layout\\navmenu.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|solutionrelative:layout\\navmenu.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|c:\\users\\marco\\onedrive - cnr\\zoratech\\visualstudio2026\\blazorapp1\\models\\impiantimodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|solutionrelative:models\\impiantimodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|c:\\users\\marco\\onedrive - cnr\\zoratech\\visualstudio2026\\blazorapp1\\pages\\upload.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|solutionrelative:pages\\upload.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|c:\\users\\marco\\onedrive - cnr\\zoratech\\visualstudio2026\\blazorapp1\\wwwroot\\index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|solutionrelative:wwwroot\\index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|c:\\users\\marco\\onedrive - cnr\\zoratech\\visualstudio2026\\blazorapp1\\pages\\impiantodettaglio.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|solutionrelative:pages\\impiantodettaglio.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|c:\\users\\marco\\onedrive - cnr\\zoratech\\visualstudio2026\\blazorapp1\\pages\\admin.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
@@ -38,11 +22,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ImpiantoDettaglio.razor",
+              "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\ImpiantoDettaglio.razor",
+              "RelativeDocumentMoniker": "Pages\\ImpiantoDettaglio.razor",
+              "ToolTip": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\ImpiantoDettaglio.razor",
+              "RelativeToolTip": "Pages\\ImpiantoDettaglio.razor",
+              "ViewState": "AgIAAJAAAAAAAAAAAAAAAA8AAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-02-02T17:13:53.17Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -52,53 +49,14 @@
               "RelativeDocumentMoniker": "Pages\\Impianti.razor",
               "ToolTip": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\Impianti.razor",
               "RelativeToolTip": "Pages\\Impianti.razor",
-              "ViewState": "AgIAALQAAAAAAAAAAAAIwMkAAAA7AAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAK4AAAAeAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-02-02T16:20:53.949Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "ImpiantiModel.cs",
-              "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Models\\ImpiantiModel.cs",
-              "RelativeDocumentMoniker": "Models\\ImpiantiModel.cs",
-              "ToolTip": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Models\\ImpiantiModel.cs",
-              "RelativeToolTip": "Models\\ImpiantiModel.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-02T16:19:22.415Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Login.razor",
-              "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\Login.razor",
-              "RelativeDocumentMoniker": "Pages\\Login.razor",
-              "ToolTip": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\Login.razor",
-              "RelativeToolTip": "Pages\\Login.razor",
-              "ViewState": "AgIAADQAAAAAAAAAAAAnwFYAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-02-02T13:58:39.206Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "NavMenu.razor",
-              "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Layout\\NavMenu.razor",
-              "RelativeDocumentMoniker": "Layout\\NavMenu.razor",
-              "ToolTip": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Layout\\NavMenu.razor",
-              "RelativeToolTip": "Layout\\NavMenu.razor",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFwAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-19T16:25:47.808Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
               "Title": "Admin.razor",
               "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\Admin.razor",
               "RelativeDocumentMoniker": "Pages\\Admin.razor",
@@ -107,32 +65,6 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAHQAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-01-19T16:20:00.503Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "index.html",
-              "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\wwwroot\\index.html",
-              "RelativeDocumentMoniker": "wwwroot\\index.html",
-              "ToolTip": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\wwwroot\\index.html",
-              "RelativeToolTip": "wwwroot\\index.html",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGoAAAAHAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
-              "WhenOpened": "2026-01-19T15:39:25.028Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Upload.razor",
-              "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\Upload.razor",
-              "RelativeDocumentMoniker": "Pages\\Upload.razor",
-              "ToolTip": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\Upload.razor",
-              "RelativeToolTip": "Pages\\Upload.razor",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABICAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-01-15T13:13:04.325Z",
               "EditorCaption": ""
             }
           ]
