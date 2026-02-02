@@ -11,16 +11,19 @@
 
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="nav flex-column">
+
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
             </NavLink>
         </div>
+
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="counter">
                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
             </NavLink>
         </div>
+
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="weather">
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
@@ -33,63 +36,58 @@
             </NavLink>
         </div>
 
-        @* Mostra "Impianti" solo quando i dati sessione sono stati letti e l'utente è loggato *@
-        @if (Loaded && loggedUser is not null)
+        @* Mostra "Impianti" se l'utente è loggato *@
+        @if (!string.IsNullOrEmpty(loggedUser))
         {
-            <li class="nav-item px-3">
+            <div class="nav-item px-3">
                 <NavLink class="nav-link" href="impianti">
                     <span class="oi oi-list-rich" aria-hidden="true"></span> Impianti
                 </NavLink>
-            </li>
+            </div>
         }
 
         @* Mostra "Admin" solo agli admin *@
-        @if (Loaded && loggedRole == "admin")
+        @if (string.Equals(loggedRole, "admin", StringComparison.OrdinalIgnoreCase))
         {
-            <li class="nav-item px-3">
+            <div class="nav-item px-3">
                 <NavLink class="nav-link" href="admin">
                     <span class="oi oi-cog" aria-hidden="true"></span> Admin
                 </NavLink>
-            </li>
+            </div>
         }
 
-        <li class="nav-item px-3">
+        <div class="nav-item px-3">
             <NavLink class="nav-link" href="login">
                 <span class="oi oi-people" aria-hidden="true"></span> Login
             </NavLink>
-        </li>
+        </div>
+
     </nav>
 </div>
 
 @code {
     private bool collapseNavMenu = true;
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
     private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
 
-    // --- SESSION STATE ---
+    // Stato sessione
     private string? loggedUser;
     private string? loggedRole;
-    private bool Loaded = false;
 
-    // Leggiamo la sessione al PRIMO render e poi forziamo il rerender del menu
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
+        // Dopo il login usi forceLoad:true, quindi la WebApp si ricarica e questi valori sono già disponibili
+        try
         {
-            try
-            {
-                loggedUser = await JS.InvokeAsync<string>("sessionStorage.getItem", "loggedUser");
-                loggedRole = await JS.InvokeAsync<string>("sessionStorage.getItem", "loggedRole");
-            }
-            catch
-            {
-                // Ignora eventuali errori di JS interop; il menu rimane nello stato base
-            }
-            finally
-            {
-                Loaded = true;
-                StateHasChanged(); // forza l'aggiornamento del menu senza refresh manuale
-            }
+            loggedUser = await JS.InvokeAsync<string>("sessionStorage.getItem", "loggedUser");
+            loggedRole = await JS.InvokeAsync<string>("sessionStorage.getItem", "loggedRole");
+        }
+        catch
+        {
+            // in caso di errore JS interop, lascia i menu nello stato base
+            loggedUser = null;
+            loggedRole = null;
         }
     }
 }
