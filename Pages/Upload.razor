@@ -11,6 +11,12 @@
 
 <h3>Carica i tuoi file</h3>
 
+<!-- WELCOME -->
+<div class="alert alert-info">
+    Utente collegato: <strong>@LoggedUser</strong>
+</div>
+
+
 <!-- Pulsante OneDrive -->
 <button class="btn btn-primary" @onclick="ApriOneDrive">
     Carica su OneDrive (File Request)
@@ -158,6 +164,10 @@ else
 }
 
 @code {
+
+    // === WELCOME ===
+    private string? LoggedUser;
+
     // === OneDrive ===
     private string oneDriveFileRequestUrl =
         "https://cnrsc-my.sharepoint.com/:f:/g/personal/marcomaria_zora_cnr_it/IgBduHaMs9w8Rrv0sGzseFl0AdC6oy9w5_UP0wngjZvbgjQ";
@@ -178,10 +188,11 @@ else
     // ======= INIT: login check + prima lista =======
     protected override async Task OnInitializedAsync()
     {
-        var user = await JS.InvokeAsync<string>("sessionStorage.getItem", "loggedUser");
-        if (string.IsNullOrEmpty(user))
+        LoggedUser = await JS.InvokeAsync<string>("sessionStorage.getItem", "loggedUser");
+
+        if (string.IsNullOrEmpty(LoggedUser))
         {
-            Nav.NavigateTo("/login");
+            Nav.NavigateTo("login");
             return;
         }
 
