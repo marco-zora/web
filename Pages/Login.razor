@@ -81,7 +81,7 @@
         await JS.InvokeVoidAsync("sessionStorage.setItem", "loggedRole", match.role);
 
         // URL riferiti a /web/ perchè in index.html <base href="/web/" />
-        if (match.role == "admin") await JS.InvokeVoidAsync("location.assign", "admin");//Nav.NavigateTo("admin", forceLoad:true);
+        if (match.role == "admin") Nav.NavigateTo("admin", forceLoad: true); //await JS.InvokeVoidAsync("location.assign", "admin");
         else Nav.NavigateTo("upload", forceLoad: true);
     }
 }
