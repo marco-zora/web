@@ -21,97 +21,89 @@
 
 @if (LoggedRole == "admin")
 {
+    <h3 class="mt-2 mb-4 text-primary">
+        Impianti per Cliente
+    </h3>
+
     @foreach (var kvp in Root!)
     {
-        <div class="mb-4">
-            <h4 class="text-primary">@kvp.Key</h4>
+        var cliente = kvp.Key;
+        var impiantiCliente = kvp.Value.impianti;
 
-            <button class="btn btn-sm btn-success mb-3"
-                    @onclick="() => AddImpianto(kvp.Key)">
-                <i class="bi bi-plus-circle"></i> Nuovo Impianto
-            </button>
+        <div class="mb-5">
 
-            <div class="row g-3">
-                @foreach (var imp in kvp.Value.impianti)
-                {
-                    <div class="col-md-4">
-                        <div class="card shadow-sm h-100">
+            <!-- TITOLO CLIENTE -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="text-dark fw-bold">
+                    <i class="bi bi-person-badge"></i>
+                    @cliente
+                </h4>
 
-                            <div class="card-body">
-                                <h5>@imp.nome</h5>
-                                <p class="text-muted">@imp.indirizzo</p>
-                                <span class="badge bg-secondary">@imp.monitors.Count device</span>
-                            </div>
+                <button class="btn btn-sm btn-success"
+                        @onclick="() => AddImpianto(cliente)">
+                    <i class="bi bi-plus-circle"></i> Nuovo Impianto
+                </button>
+            </div>
 
-                            <div class="card-footer d-flex justify-content-between">
-                                <button class="btn btn-sm btn-primary"
-                                        @onclick="() => ApriDettaglio(kvp.Key, imp)">
-                                    Dettaglio
-                                </button>
+            <!-- LISTA IMPIANTI PER CLIENTE -->
+            @if (impiantiCliente.Count == 0)
+            {
+                <p class="text-muted">Nessun impianto definito per questo cliente.</p>
+            }
+            else
+            {
+                <div class="row g-4">
 
-                                <span>
-                                    <button class="btn btn-sm btn-outline-primary me-2"
-                                            @onclick="() => RenameImpianto(kvp.Key, imp)">
-                                        Rinomina
+                    @foreach (var imp in impiantiCliente)
+                    {
+                        <div class="col-md-4">
+                            <div class="card shadow-sm h-100 border-0">
+
+                                <div class="card-body">
+                                    <h5 class="card-title">@imp.nome</h5>
+                                    @if (!string.IsNullOrWhiteSpace(imp.indirizzo))
+                                    {
+                                        <p class="card-text text-muted">
+                                            <i class="bi bi-geo-alt"></i>
+                                            @imp.indirizzo
+                                        </p>
+                                    }
+
+                                    <span class="badge bg-secondary">
+                                        @imp.monitors.Count device
+                                    </span>
+                                </div>
+
+                                <div class="card-footer bg-white d-flex justify-content-between">
+                                    <button class="btn btn-sm btn-outline-primary"
+                                            @onclick="() => ApriDettaglio(cliente, imp)">
+                                        Dettaglio
                                     </button>
 
-                                    <button class="btn btn-sm btn-outline-danger"
-                                            @onclick="() => DeleteImpianto(kvp.Key, imp)">
-                                        Elimina
-                                    </button>
-                                </span>
+                                    <span>
+                                        <button class="btn btn-sm btn-outline-primary me-2"
+                                                @onclick="() => RenameImpianto(cliente, imp)">
+                                            Rinomina
+                                        </button>
+
+                                        <button class="btn btn-sm btn-outline-danger"
+                                                @onclick="() => DeleteImpianto(cliente, imp)">
+                                            Elimina
+                                        </button>
+                                    </span>
+                                </div>
+
                             </div>
                         </div>
-                    </div>
-                }
-            </div>
+                    }
 
-        </div>
+                </div>
+            }
+
+        </div> <!-- fine blocco cliente -->
     }
 }
-else
-{
-    <h4 class="text-primary">@LoggedUser</h4>
 
-    <button class="btn btn-sm btn-success mb-3"
-            @onclick="() => AddImpianto(LoggedUser!)">
-        <i class="bi bi-plus-circle"></i> Nuovo Impianto
-    </button>
-
-    <div class="row g-3">
-        @foreach (var imp in UserData!.impianti)
-        {
-            <div class="col-md-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body">
-                        <h5>@imp.nome</h5>
-                        <p class="text-muted">@imp.indirizzo</p>
-                        <span class="badge bg-secondary">@imp.monitors.Count device</span>
-                    </div>
-
-                    <div class="card-footer d-flex justify-content-between">
-                        <button class="btn btn-sm btn-primary"
-                                @onclick="() => ApriDettaglio(LoggedUser!, imp)">
-                            Dettaglio
-                        </button>
-
-                        <span>
-                            <button class="btn btn-sm btn-outline-primary me-2"
-                                    @onclick="() => RenameImpianto(LoggedUser!, imp)">
-                                Rinomina
-                            </button>
-
-                            <button class="btn btn-sm btn-outline-danger"
-                                    @onclick="() => DeleteImpianto(LoggedUser!, imp)">
-                                Elimina
-                            </button>
-                        </span>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
-}
 
 @code {
     private string ProxyBase = "https://first.marcomaria-zora.workers.dev/api/dav/UPLOADS/";
