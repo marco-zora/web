@@ -15,7 +15,7 @@
 {
     <div class="alert alert-info py-2 mb-3">
         Utente collegato: <strong>@LoggedUser</strong>
-        <span class="ms-3 text-muted">Path corrente: <code>@UserBasePath</code></span>
+        <span class="ms-3 text-muted">Path corrente: <code>@_basePath</code></span>
     </div>
 }
 
@@ -62,7 +62,7 @@ else
 {
     @if (Items.Count == 0)
     {
-        <p>Nessun file in <code>@UserBasePath</code>.</p>
+        <p>Nessun file in <code>@_basePath</code>.</p>
     }
     else
     {
@@ -82,8 +82,9 @@ else
                     var isVid = IsVideo(it.ContentType, it.Name);
                     var fileUrl = FileUrl(it.Name);
                     var vidId = $"vid_{Uri.EscapeDataString(it.Name)}"; // id stabile per observer
-                                                                        <tr>
-                                                                            <td>
+
+                    <tr>
+                        <td>
                             @if (isVid)
                             {
                                 <!-- Miniatura: JS decide autoplay solo se visibile -->
@@ -183,9 +184,7 @@ else
 
     // --- Percorsi dinamici ---
     private const string RootCollection = "UPLOADS/";  // trailing slash
-    private string UserBasePath => string.Equals(LoggedRole, "admin", StringComparison.OrdinalIgnoreCase)
-        ? RootCollection
-        : $"{RootCollection}{Uri.EscapeDataString(LoggedUser!)}/";
+    private string _basePath = RootCollection;         // valore sicuro iniziale (evita null in primo render)
 
     private string Status = "";
     private bool Loading = false;
@@ -204,8 +203,19 @@ else
 
         if (string.IsNullOrWhiteSpace(LoggedUser))
         {
-            Nav.NavigateTo("login"); // percorso relativo → rispetta <base href="/web/">
+            Nav.NavigateTo("login");  // relativo → rispetta /web/
             return;
+        }
+
+        // Calcolo del base path SOLO dopo avere il nome utente
+        if (string.Equals(LoggedRole, "admin", StringComparison.OrdinalIgnoreCase))
+        {
+            _basePath = RootCollection;  // admin vede UPLOADS/
+        }
+        else
+        {
+            var safeUser = Uri.EscapeDataString(LoggedUser); // non null qui
+            _basePath = $"{RootCollection}{safeUser}/";
         }
 
         // Se non admin, assicuriamo la cartella personale
@@ -221,13 +231,13 @@ else
     {
         try
         {
-            var url = new Uri(ProxyBase + UserBasePath);
+            var url = new Uri(ProxyBase + _basePath);
 
             // PROPFIND Depth:0 per verificare se esiste
             const string body = @"<?xml version=""1.0"" encoding=""utf-8""?>
-            <d:propfind xmlns:d=""DAV:"">
-              <d:prop><d:displayname/></d:prop>
-            </d:propfind>";
+<d:propfind xmlns:d=""DAV:"">
+  <d:prop><d:displayname/></d:prop>
+</d:propfind>";
 
             using var probeReq = new HttpRequestMessage(HttpMethod.Post, url);
             probeReq.Headers.Add("X-Method-Override", "PROPFIND");
@@ -236,18 +246,16 @@ else
             probeReq.Content = new StringContent(body, Encoding.UTF8, "application/xml");
 
             var probeRes = await Http.SendAsync(probeReq);
-            if (probeRes.IsSuccessStatusCode)
-                return; // esiste già
+            if (probeRes.IsSuccessStatusCode) return; // esiste già
 
             // Se non esiste, MKCOL
             using var mkReq = new HttpRequestMessage(HttpMethod.Post, url);
             mkReq.Headers.Add("X-Method-Override", "MKCOL");
-            var mkRes = await Http.SendAsync(mkReq);
-            // (opzionale: controlla mkRes.StatusCode per logging)
+            await Http.SendAsync(mkReq);
         }
         catch
         {
-            // Non bloccare la pagina: al limite fallirà la lista con un messaggio
+            // Non bloccare la pagina; eventuali errori appariranno nella lista
         }
     }
 
@@ -266,8 +274,8 @@ else
         {
             try
             {
-                var url = new Uri(ProxyBase + UserBasePath + Uri.EscapeDataString(file.Name));
-                using var stream = file.OpenReadStream(long.MaxValue); // valuta chunk+progress in futuro
+                var url = new Uri(ProxyBase + _basePath + Uri.EscapeDataString(file.Name));
+                using var stream = file.OpenReadStream(long.MaxValue); // (valuta chunk+progress in futuro)
                 using var content = new StreamContent(stream);
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
 
@@ -295,18 +303,18 @@ else
         ListError = null;
         try
         {
-            var url = new Uri(ProxyBase + UserBasePath);
+            var url = new Uri(ProxyBase + _basePath);
 
             const string body = @"<?xml version=""1.0"" encoding=""utf-8""?>
-            <d:propfind xmlns:d=""DAV:"">
-              <d:prop>
-                <d:displayname/>
-                <d:resourcetype/>
-                <d:getcontentlength/>
-                <d:getlastmodified/>
-                <d:getcontenttype/>
-              </d:prop>
-            </d:propfind>";
+<d:propfind xmlns:d=""DAV:"">
+  <d:prop>
+    <d:displayname/>
+    <d:resourcetype/>
+    <d:getcontentlength/>
+    <d:getlastmodified/>
+    <d:getcontenttype/>
+  </d:prop>
+</d:propfind>";
 
             using var req = new HttpRequestMessage(HttpMethod.Post, url);
             req.Headers.Add("X-Method-Override", "PROPFIND");
@@ -323,7 +331,7 @@ else
             }
 
             var xml = await res.Content.ReadAsStringAsync();
-            Items = ParsePropfind(xml, LoggedUser, LoggedRole);
+            Items = ParsePropfind(xml);
             LastListRefreshText = $"(aggiornato alle {DateTime.Now:HH:mm:ss})";
         }
         catch (Exception ex)
@@ -337,7 +345,8 @@ else
         }
     }
 
-    private static List<DavItem> ParsePropfind(string xml, string? loggedUser, string? loggedRole)
+    // Nota: NON static → può accedere allo stato della componente se serve
+    private List<DavItem> ParsePropfind(string xml)
     {
         var list = new List<DavItem>();
         var doc = XDocument.Parse(xml);
@@ -352,7 +361,6 @@ else
                                .FirstOrDefault(ps =>
                                    (string?)ps.Element(d + "status") != null &&
                                    ps.Element(d + "status")!.Value.Contains("200"));
-
             if (propstat == null) continue;
 
             var prop = propstat.Element(d + "prop");
@@ -363,30 +371,29 @@ else
             var nameFromHref = decodedHref.TrimEnd('/')
                                           .Split('/', StringSplitOptions.RemoveEmptyEntries)
                                           .LastOrDefault() ?? "";
-
             var name = string.IsNullOrWhiteSpace(displayName) ? nameFromHref : displayName;
 
+            // Salta cartelle (collection)
             var isCollection = prop.Element(d + "resourcetype")?.Element(d + "collection") != null;
             if (isCollection) continue;
 
+            // Dimensione
             long size = 0;
             var sizeStr = prop.Element(d + "getcontentlength")?.Value;
             if (!string.IsNullOrWhiteSpace(sizeStr))
                 long.TryParse(sizeStr, out size);
 
+            // Ultima modifica
             DateTimeOffset? lm = null;
             var lmStr = prop.Element(d + "getlastmodified")?.Value;
             if (!string.IsNullOrWhiteSpace(lmStr) && DateTimeOffset.TryParse(lmStr, out var lmv))
                 lm = lmv;
 
+            // Content-Type
             var ctype = prop.Element(d + "getcontenttype")?.Value;
 
-            // Evita voce radice corrente (UPLOADS o UPLOADS/<user>)
-            if (string.IsNullOrWhiteSpace(name) ||
-                name.Equals("UPLOADS", StringComparison.OrdinalIgnoreCase) ||
-                (name.Equals(loggedUser, StringComparison.OrdinalIgnoreCase) &&
-                 !string.Equals(loggedRole, "admin", StringComparison.OrdinalIgnoreCase)))
-                continue;
+            // Evita la voce radice se mai comparisse come file (in genere non serve)
+            if (string.IsNullOrWhiteSpace(name)) continue;
 
             list.Add(new DavItem(name, IsFile: true, Size: size, LastModified: lm, ContentType: ctype));
         }
@@ -462,7 +469,7 @@ else
     }
 
     private string FileUrl(string name)
-        => ProxyBase + UserBasePath + Uri.EscapeDataString(name);
+        => ProxyBase + _basePath + Uri.EscapeDataString(name);
 
     private bool ShowViewer = false;
     private DavItem? SelectedItem = null;
@@ -488,12 +495,20 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        try
         {
-            await JS.InvokeVoidAsync("previewObserver.init");
+            if (firstRender)
+            {
+                await JS.InvokeVoidAsync("previewObserver.init");
+            }
+            // Scansione ad ogni render: registra i nuovi <video data-preview="1">
+            await JS.InvokeVoidAsync("previewObserver.scan");
         }
-        // Scansione ad ogni render: registra i nuovi <video data-preview="1">
-        await JS.InvokeVoidAsync("previewObserver.scan");
+        catch
+        {
+            // Evita la barra gialla di Blazor; logga solo in console
+            Console.WriteLine("previewObserver init/scan skipped");
+        }
     }
 
     public async ValueTask DisposeAsync()
