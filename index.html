@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BlazorApp1</title>
     <base href="/web/" />
-    <link href="_framework/dotnet.0ezio1akfa.js" rel="preload" as="script" fetchpriority="high" crossorigin="anonymous" integrity="sha256-qN/Z7/8uc3UbobBREwBe26cBTAsv8Dm1WvmYKv5GOvQ=" />
+    <link href="_framework/dotnet.wx0ks346l3.js" rel="preload" as="script" fetchpriority="high" crossorigin="anonymous" integrity="sha256-PHbxN36KZ076CT6VJ6bSc+h3saQw2F9+2kKKO3LELh4=" />
     <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
@@ -14,99 +14,23 @@
     <script type="importmap">{
   "imports": {
     "./_framework/blazor.webassembly.js": "./_framework/blazor.webassembly.66stpp682q.js",
-    "./_framework/dotnet.js": "./_framework/dotnet.0ezio1akfa.js",
     "./_framework/dotnet.native.js": "./_framework/dotnet.native.87vtjjdetb.js",
-    "./_framework/dotnet.runtime.js": "./_framework/dotnet.runtime.2tx45g8lli.js"
+    "./_framework/dotnet.runtime.js": "./_framework/dotnet.runtime.2tx45g8lli.js",
+    "./_framework/dotnet.js": "./_framework/dotnet.wx0ks346l3.js"
   },
   "scopes": {},
   "integrity": {
     "./_framework/blazor.webassembly.66stpp682q.js": "sha256-3lCWrko3zwspV40aQhs2S/IMkRSarnHRKIdkHhuXIBA=",
     "./_framework/blazor.webassembly.js": "sha256-3lCWrko3zwspV40aQhs2S/IMkRSarnHRKIdkHhuXIBA=",
-    "./_framework/dotnet.0ezio1akfa.js": "sha256-qN/Z7/8uc3UbobBREwBe26cBTAsv8Dm1WvmYKv5GOvQ=",
-    "./_framework/dotnet.js": "sha256-qN/Z7/8uc3UbobBREwBe26cBTAsv8Dm1WvmYKv5GOvQ=",
+    "./_framework/dotnet.js": "sha256-PHbxN36KZ076CT6VJ6bSc+h3saQw2F9+2kKKO3LELh4=",
     "./_framework/dotnet.native.87vtjjdetb.js": "sha256-zE11fbcG2CeLl1Zi+NJgMOfWpdjuUWNte+icrtAO58I=",
     "./_framework/dotnet.native.js": "sha256-zE11fbcG2CeLl1Zi+NJgMOfWpdjuUWNte+icrtAO58I=",
     "./_framework/dotnet.runtime.2tx45g8lli.js": "sha256-2lZh9yO0fnzm3Xt7yV+Kox3DH3nK7L8hDhm84VT1xco=",
-    "./_framework/dotnet.runtime.js": "sha256-2lZh9yO0fnzm3Xt7yV+Kox3DH3nK7L8hDhm84VT1xco="
+    "./_framework/dotnet.runtime.js": "sha256-2lZh9yO0fnzm3Xt7yV+Kox3DH3nK7L8hDhm84VT1xco=",
+    "./_framework/dotnet.wx0ks346l3.js": "sha256-PHbxN36KZ076CT6VJ6bSc+h3saQw2F9+2kKKO3LELh4="
   }
 }</script>
 </head>
-
-
-<!-- (Obbligatorio per il toggle) -->
-
-<script>
-    window.previewObserver = (function () {
-        let observer = null;
-        let animated = false;
-        const seen = new Set();
-
-        function init() {
-            if (observer) return;
-            observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const el = entry.target;
-                    if (!(el instanceof HTMLVideoElement)) return;
-
-                    if (!animated) { el.pause(); return; }
-
-                    if (entry.isIntersecting) {
-                        el.muted = true;
-                        el.loop = true;
-                        try { el.preload = 'auto'; } catch { }
-                        el.play().catch(() => { });
-                    } else {
-                        el.pause();
-                    }
-                });
-            }, {
-                root: null,
-                rootMargin: '100px 0px',
-                threshold: 0.25
-            });
-        }
-
-        function observe(el) {
-            if (!el || !el.id || seen.has(el.id)) return;
-            seen.add(el.id);
-            observer.observe(el);
-        }
-
-        function scan() {
-            init();
-            document.querySelectorAll('video[data-preview="1"]').forEach(observe);
-        }
-
-        function setAnimated(on) {
-            animated = !!on;
-            if (!animated) {
-                document.querySelectorAll('video[data-preview="1"]').forEach(v => v.pause());
-            } else {
-                document.querySelectorAll('video[data-preview="1"]').forEach(v => {
-                    const r = v.getBoundingClientRect();
-                    const h = window.innerHeight || document.documentElement.clientHeight;
-                    const inView = r.bottom >= 0 && r.top <= h;
-                    if (inView) {
-                        v.muted = true;
-                        v.loop = true;
-                        try { v.preload = 'auto'; } catch { }
-                        v.play().catch(() => { });
-                    }
-                });
-            }
-        }
-
-        function dispose() {
-            if (observer) { observer.disconnect(); observer = null; }
-            seen.clear();
-        }
-
-        return { init, scan, setAnimated, dispose };
-    })();
-</script>
-
-
-
 
 <body>
     <div id="app">
@@ -122,8 +46,79 @@
         <a href="." class="reload">Reload</a>
         <span class="dismiss">🗙</span>
     </div>
+
+    <!-- (Obbligatorio per il toggle) -->
+    <script>
+        window.previewObserver = (function () {
+            let observer = null;
+            let animated = false;
+            const seen = new Set();
+
+            function init() {
+                if (observer) return;
+                observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        const el = entry.target;
+                        if (!(el instanceof HTMLVideoElement)) return;
+
+                        if (!animated) { el.pause(); return; }
+
+                        if (entry.isIntersecting) {
+                            el.muted = true;
+                            el.loop = true;
+                            try { el.preload = 'auto'; } catch { }
+                            el.play().catch(() => { });
+                        } else {
+                            el.pause();
+                        }
+                    });
+                }, {
+                    root: null,
+                    rootMargin: '100px 0px',
+                    threshold: 0.25
+                });
+            }
+
+            function observe(el) {
+                if (!el || !el.id || seen.has(el.id)) return;
+                seen.add(el.id);
+                observer.observe(el);
+            }
+
+            function scan() {
+                init();
+                document.querySelectorAll('video[data-preview="1"]').forEach(observe);
+            }
+
+            function setAnimated(on) {
+                animated = !!on;
+                if (!animated) {
+                    document.querySelectorAll('video[data-preview="1"]').forEach(v => v.pause());
+                } else {
+                    document.querySelectorAll('video[data-preview="1"]').forEach(v => {
+                        const r = v.getBoundingClientRect();
+                        const h = window.innerHeight || document.documentElement.clientHeight;
+                        const inView = r.bottom >= 0 && r.top <= h;
+                        if (inView) {
+                            v.muted = true;
+                            v.loop = true;
+                            try { v.preload = 'auto'; } catch { }
+                            v.play().catch(() => { });
+                        }
+                    });
+                }
+            }
+
+            function dispose() {
+                if (observer) { observer.disconnect(); observer = null; }
+                seen.clear();
+            }
+
+            return { init, scan, setAnimated, dispose };
+        })();
+    </script>
+
     <script src="gh-pages.js"></script>
-    <!-- <script src="_framework/blazor.webassembly.js"></script> -->
     <script src="_framework/blazor.webassembly.66stpp682q.js"></script>
 </body>
 
