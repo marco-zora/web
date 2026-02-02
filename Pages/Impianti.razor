@@ -21,89 +21,95 @@
 
 @if (LoggedRole == "admin")
 {
-    <h3 class="mt-2 mb-4 text-primary">
-        Impianti per Cliente
-    </h3>
+    <h2 class="mb-4 fw-bold text-primary">
+        <i class="bi bi-collection"></i> Impianti di Tutti i Clienti
+    </h2>
 
-    @foreach (var kvp in Root!)
+    @foreach (var cliente in Root!.Keys.OrderBy(k => k))
     {
-        var cliente = kvp.Key;
-        var impiantiCliente = kvp.Value.impianti;
+        var impiantiCliente = Root[cliente].impianti
+                                          .OrderBy(i => i.nome)
+                                          .ToList();
 
-        <div class="mb-5">
+        <div class="mb-5 pb-3 border-bottom">
 
-            <!-- TITOLO CLIENTE -->
+            <!-- Header Cliente -->
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="text-dark fw-bold">
-                    <i class="bi bi-person-badge"></i>
-                    @cliente
-                </h4>
+                <h3 class="fw-bold text-dark m-0">
+                    <i class="bi bi-person-circle"></i> @cliente
+                </h3>
 
-                <button class="btn btn-sm btn-success"
+                <button class="btn btn-success btn-sm shadow-sm"
                         @onclick="() => AddImpianto(cliente)">
                     <i class="bi bi-plus-circle"></i> Nuovo Impianto
                 </button>
             </div>
 
-            <!-- LISTA IMPIANTI PER CLIENTE -->
             @if (impiantiCliente.Count == 0)
             {
-                <p class="text-muted">Nessun impianto definito per questo cliente.</p>
+                <p class="text-muted fst-italic">Nessun impianto registrato per questo cliente.</p>
             }
             else
             {
+                <!-- Griglia premium -->
                 <div class="row g-4">
 
                     @foreach (var imp in impiantiCliente)
                     {
-                        <div class="col-md-4">
-                            <div class="card shadow-sm h-100 border-0" style="background-color:@(imp.colore ?? "#e3f2fd") !important;">
+                        <div class="col-md-4 col-lg-3 col-xl-3">
+
+                            <div class="card h-100 border-0 shadow-sm"
+                                 style="
+                            background-color:@(imp.colore ?? "#e3f2fd") !important;
+                            transition: transform .2s ease;
+                            border-radius: 16px;
+                         "
+                                 onmouseover="this.style.transform='scale(1.03)'"
+                                 onmouseout="this.style.transform='scale(1)'">
 
                                 <div class="card-body">
-                                    <h5 class="card-title">@imp.nome</h5>
+                                    <h5 class="fw-bold">@imp.nome</h5>
+
                                     @if (!string.IsNullOrWhiteSpace(imp.indirizzo))
                                     {
-                                        <p class="card-text text-muted">
-                                            <i class="bi bi-geo-alt"></i>
-                                            @imp.indirizzo
-                                        </p>
+                                        <div class="text-muted mb-2">
+                                            <i class="bi bi-geo-alt"></i> @imp.indirizzo
+                                        </div>
                                     }
 
-                                    <span class="badge bg-secondary">
-                                        @imp.monitors.Count device
-                                    </span>
+                                    <span class="badge bg-dark">@imp.monitors.Count device</span>
                                 </div>
 
-                                <div class="card-footer bg-white d-flex justify-content-between">
-                                    <button class="btn btn-sm btn-outline-primary"
+                                <div class="card-footer bg-transparent d-flex justify-content-between">
+                                    <button class="btn btn-sm btn-primary"
                                             @onclick="() => ApriDettaglio(cliente, imp)">
-                                        Dettaglio
+                                        <i class="bi bi-search"></i> Dettaglio
                                     </button>
 
                                     <span>
                                         <button class="btn btn-sm btn-outline-primary me-2"
                                                 @onclick="() => RenameImpianto(cliente, imp)">
-                                            Rinomina
+                                            <i class="bi bi-pencil"></i>
                                         </button>
 
                                         <button class="btn btn-sm btn-outline-danger"
                                                 @onclick="() => DeleteImpianto(cliente, imp)">
-                                            Elimina
+                                            <i class="bi bi-trash"></i>
                                         </button>
                                     </span>
                                 </div>
 
                             </div>
+
                         </div>
                     }
 
                 </div>
             }
 
-        </div> <!-- fine blocco cliente -->
+        </div>
     }
 }
-
 
 @code {
     private string ProxyBase = "https://first.marcomaria-zora.workers.dev/api/dav/UPLOADS/";
