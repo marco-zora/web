@@ -14,7 +14,7 @@
     return;
 }
 
-@if (Error != null)
+@if (Error is not null)
 {
     <div class="alert alert-danger">@Error</div>
     return;
@@ -52,66 +52,17 @@
             }
             else
             {
-                <!-- Griglia orizzontale -->
+                <!-- Griglia orizzontale responsive -->
                 <div class="row g-4">
-
                     @foreach (var imp in impiantiCliente)
                     {
                         <div class="col-md-4 col-lg-3 col-xl-3">
-
-                            <div class="card h-100 border-0 shadow-sm"
-                                 style="
-                                                    background-color:@(imp.colore ?? "#e3f2fd") !important;
-                                                    transition: transform .2s ease;
-                                                    border-radius: 16px;
-                                                 "
-                                 onmouseover="this.style.transform='scale(1.03)'"
-                                 onmouseout="this.style.transform='scale(1)'">
-
-                                <div class="card-body">
-                                    <h5 class="fw-bold">@imp.nome</h5>
-
-                                    @if (!string.IsNullOrWhiteSpace(imp.indirizzo))
-                                    {
-                                        <div class="text-muted mb-2">
-                                            <i class="bi bi-geo-alt"></i> @imp.indirizzo
-                                        </div>
-                                    }
-
-                                    <span class="badge bg-dark">@imp.monitors.Count device</span>
-                                </div>
-
-                                <div class="card-footer bg-transparent d-flex justify-content-between">
-
-                                    <button class="btn btn-sm btn-outline-primary
-                                   bg-white bg-opacity-75 px-3"
-                                            @onclick="() => ApriDettaglio(cliente, imp)">
-                                        <i class="bi bi-search"></i> Dettaglio
-                                    </button>
-
-                                    <span class="d-flex">
-
-                                        <button class="btn btn-sm btn-outline-primary
-                                       bg-white bg-opacity-75 me-2 px-2"
-                                                @onclick="() => RenameImpianto(cliente, imp)">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-
-                                        <button class="btn btn-sm btn-outline-danger
-                                       bg-white bg-opacity-75 px-2"
-                                                @onclick="() => DeleteImpianto(cliente, imp)">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-
-                                    </span>
-
-                                </div>
-
-                            </div>
-
+                            <ImpiantoCard Impianto="imp"
+                                          OnDettaglio="() => ApriDettaglio(cliente, imp)"
+                                          OnRinomina="() => RenameImpianto(cliente, imp)"
+                                          OnElimina="() => DeleteImpianto(cliente, imp)" />
                         </div>
                     }
-
                 </div>
             }
 
@@ -134,50 +85,10 @@ else
         @foreach (var imp in UserData!.impianti.OrderBy(i => i.nome))
         {
             <div class="col-md-4 col-lg-3 col-xl-3">
-
-                <div class="card shadow-sm h-100 border-0"
-                     style="
-                                background-color:@(imp.colore ?? "#e3f2fd") !important;
-                                transition: transform .2s ease;
-                                border-radius: 16px;
-                             "
-                     onmouseover="this.style.transform='scale(1.03)'"
-                     onmouseout="this.style.transform='scale(1)'">
-
-                    <div class="card-body">
-                        <h5 class="fw-bold">@imp.nome</h5>
-
-                        @if (!string.IsNullOrWhiteSpace(imp.indirizzo))
-                        {
-                            <div class="text-muted mb-2">
-                                <i class="bi bi-geo-alt"></i> @imp.indirizzo
-                            </div>
-                        }
-
-                        <span class="badge bg-dark">@imp.monitors.Count device</span>
-                    </div>
-
-                    <div class="card-footer bg-transparent d-flex justify-content-between">
-                        <button class="btn btn-sm btn-outline-primary bg-white bg-opacity-75"
-                                @onclick="() => ApriDettaglio(LoggedUser!, imp)">
-                            <i class="bi bi-search"></i> Dettaglio
-                        </button>
-
-                        <span>
-                            <button class="btn btn-sm btn-outline-primary me-2 bg-white bg-opacity-75"
-                                    @onclick="() => RenameImpianto(LoggedUser!, imp)">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-
-                            <button class="btn btn-sm btn-outline-danger bg-white bg-opacity-75"
-                                    @onclick="() => DeleteImpianto(LoggedUser!, imp)">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </span>
-                    </div>
-
-                </div>
-
+                <ImpiantoCard Impianto="imp"
+                              OnDettaglio="() => ApriDettaglio(LoggedUser!, imp)"
+                              OnRinomina="() => RenameImpianto(LoggedUser!, imp)"
+                              OnElimina="() => DeleteImpianto(LoggedUser!, imp)" />
             </div>
         }
     </div>
@@ -216,23 +127,27 @@ else
     {
         try
         {
-            // carica impianti.json
+            // 1) impianti.json
             Root = await Http.GetFromJsonAsync<ImpiantiRoot>(ProxyBase + FileName);
             Root ??= new ImpiantiRoot();
 
-            // carica users.json
+            // default colore se manca (retrocompatibilità)
+            foreach (var kv in Root)
+                foreach (var imp in kv.Value.impianti)
+                    imp.colore ??= "#e3f2fd";
+
+            // 2) users.json: aggiungi anche utenti senza impianti
             UsersList = await Http.GetFromJsonAsync<List<UserRecord>>(ProxyBase + "users.json");
             UsersList ??= new List<UserRecord>();
 
-            // aggiungi clienti mancanti
             foreach (var u in UsersList)
             {
                 if (!Root.ContainsKey(u.user))
                     Root[u.user] = new UserImpianti();
             }
 
-            // se user → mostra solo i suoi impianti
-            if (LoggedRole != "admin")
+            // 3) Vista user
+            if (!string.Equals(LoggedRole, "admin", StringComparison.OrdinalIgnoreCase))
             {
                 if (!Root.ContainsKey(LoggedUser!))
                     Root[LoggedUser!] = new UserImpianti();

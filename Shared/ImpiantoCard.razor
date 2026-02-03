@@ -1,0 +1,57 @@
+﻿@using BlazorApp1.Models;
+
+<div class="card h-100 border-0 shadow-sm"
+     style="
+        background-color:@(Impianto.colore ?? "#e3f2fd") !important;
+        transition: transform .2s ease;
+        border-radius: 16px;
+     "
+     onmouseover="this.style.transform='scale(1.03)'"
+     onmouseout="this.style.transform='scale(1)'">
+
+    <div class="card-body">
+        <h5 class="fw-bold">@Impianto.nome</h5>
+
+        @if (!string.IsNullOrWhiteSpace(Impianto.indirizzo))
+        {
+            <div class="text-muted mb-2">
+                <i class="bi bi-geo-alt"></i> @Impianto.indirizzo
+            </div>
+        }
+
+        <span class="badge bg-dark">@Impianto.monitors.Count device</span>
+    </div>
+
+    <div class="card-footer bg-transparent d-flex justify-content-between">
+
+        <button class="btn btn-sm btn-outline-primary bg-white bg-opacity-75"
+                @onclick="DettaglioClicked">
+            <i class="bi bi-search"></i> Dettaglio
+        </button>
+
+        <span>
+            <button class="btn btn-sm btn-outline-primary me-2 bg-white bg-opacity-75"
+                    @onclick="RinominaClicked">
+                <i class="bi bi-pencil"></i>
+            </button>
+
+            <button class="btn btn-sm btn-outline-danger bg-white bg-opacity-75"
+                    @onclick="EliminaClicked">
+                <i class="bi bi-trash"></i>
+            </button>
+        </span>
+
+    </div>
+
+</div>
+
+@code {
+    [Parameter] public Impianto Impianto { get; set; } = default!;
+    [Parameter] public EventCallback OnDettaglio { get; set; }
+    [Parameter] public EventCallback OnRinomina { get; set; }
+    [Parameter] public EventCallback OnElimina { get; set; }
+
+    private async Task DettaglioClicked() => await OnDettaglio.InvokeAsync();
+    private async Task RinominaClicked() => await OnRinomina.InvokeAsync();
+    private async Task EliminaClicked() => await OnElimina.InvokeAsync();
+}
