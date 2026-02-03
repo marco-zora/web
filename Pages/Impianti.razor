@@ -22,6 +22,7 @@
     return;
 }
 
+<!-- Vista ADMIN -->
 @if (LoggedRole == "admin")
 {
     <h2 class="mb-4 fw-bold text-primary">
@@ -54,18 +55,19 @@
             }
             else
             {
-                <!-- Griglia orizzontale responsive -->
-                <div class="row g-4">
+                <!-- Griglia a wrap con cards a larghezza fissa -->
+                <div class="impianti-grid">
                     @foreach (var imp in impiantiCliente)
                     {
-                        <div class="col-md-4 col-lg-3 col-xl-3">
+                        <div class="impianto-cell">
                             <ImpiantoCard Impianto="imp"
+                                          ShowButtonLabels="true"
                                           OnDettaglio="() => ApriDettaglio(cliente, imp)"
                                           OnRinomina="() => RenameImpianto(cliente, imp)"
                                           OnElimina="() => DeleteImpianto(cliente, imp)" />
                         </div>
                     }
-                </div>
+                </div>               
             }
 
         </div>
@@ -83,17 +85,20 @@ else
         </button>
     </div>
 
-    <div class="row g-4">
+
+    <div class="impianti-grid">
         @foreach (var imp in UserData!.impianti.OrderBy(i => i.nome))
         {
-            <div class="col-md-4 col-lg-3 col-xl-3">
+            <div class="impianto-cell">
                 <ImpiantoCard Impianto="imp"
+                              ShowButtonLabels="true"
                               OnDettaglio="() => ApriDettaglio(LoggedUser!, imp)"
                               OnRinomina="() => RenameImpianto(LoggedUser!, imp)"
                               OnElimina="() => DeleteImpianto(LoggedUser!, imp)" />
             </div>
         }
     </div>
+
 }
 
 @code {
