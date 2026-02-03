@@ -1,16 +1,15 @@
-﻿@using BlazorApp1.Models;
+﻿@using BlazorApp1.Models
 
-<div class="card h-100 border-0 shadow-sm"
+<div class="card h-100 border-0 shadow-sm impianto-card"
      style="
         background-color:@(Impianto.colore ?? "#e3f2fd") !important;
         transition: transform .2s ease;
-        border-radius: 16px;
-     "
+        border-radius: 16px;"
      onmouseover="this.style.transform='scale(1.03)'"
      onmouseout="this.style.transform='scale(1)'">
 
     <div class="card-body">
-        <h5 class="fw-bold">@Impianto.nome</h5>
+        <h5 class="fw-bold mb-1">@Impianto.nome</h5>
 
         @if (!string.IsNullOrWhiteSpace(Impianto.indirizzo))
         {
@@ -19,30 +18,48 @@
             </div>
         }
 
-        <span class="badge bg-dark">@Impianto.monitors.Count monitors</span>
+        <span class="badge bg-dark">@Impianto.monitors.Count monitor@(Impianto.monitors.Count == 1 ? "" : "s")</span>
     </div>
 
-    <div class="card-footer bg-transparent d-flex justify-content-between">
+    <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
 
-        <button class="btn btn-sm btn-outline-primary bg-white bg-opacity-75"
+        <!-- Dettaglio: outline + micro-pannello chiaro sotto -->
+        <button class="btn btn-sm btn-outline-primary bg-white bg-opacity-85 px-3 shadow-0"
+                title="Apri dettaglio impianto"
                 @onclick="DettaglioClicked">
-            <i class="bi bi-search"></i> Dettaglio
+            <i class="bi bi-search me-1"></i>
+            @if (ShowButtonLabels)
+            {
+                <span>Dettaglio</span>
+            }
         </button>
 
-        <span>
-            <button class="btn btn-sm btn-outline-primary me-2 bg-white bg-opacity-75"
+        <div class="d-flex align-items-center gap-2">
+
+            <!-- Rinomina -->
+            <button class="btn btn-sm btn-outline-primary bg-white bg-opacity-85 px-2 shadow-0"
+                    title="Rinomina impianto"
                     @onclick="RinominaClicked">
-                <i class="bi bi-pencil"></i>
+                <i class="bi bi-pencil me-1"></i>
+                @if (ShowButtonLabels)
+                {
+                    <span>Rinomina</span>
+                }
             </button>
 
-            <button class="btn btn-sm btn-outline-danger bg-white bg-opacity-75"
+            <!-- Elimina -->
+            <button class="btn btn-sm btn-outline-danger bg-white bg-opacity-85 px-2 shadow-0"
+                    title="Elimina impianto"
                     @onclick="EliminaClicked">
-                <i class="bi bi-trash"></i>
+                <i class="bi bi-trash me-1"></i>
+                @if (ShowButtonLabels)
+                {
+                    <span>Elimina</span>
+                }
             </button>
-        </span>
+        </div>
 
     </div>
-
 </div>
 
 @code {
@@ -51,7 +68,12 @@
     [Parameter] public EventCallback OnRinomina { get; set; }
     [Parameter] public EventCallback OnElimina { get; set; }
 
-    private async Task DettaglioClicked() => await OnDettaglio.InvokeAsync();
-    private async Task RinominaClicked() => await OnRinomina.InvokeAsync();
-    private async Task EliminaClicked() => await OnElimina.InvokeAsync();
+    /// <summary>
+    /// Mostra le etichette testuali accanto alle icone (true = etichetta + icona; false = solo icona).
+    /// </summary>
+    [Parameter] public bool ShowButtonLabels { get; set; } = true;
+
+    private Task DettaglioClicked() => OnDettaglio.InvokeAsync();
+    private Task RinominaClicked() => OnRinomina.InvokeAsync();
+    private Task EliminaClicked() => OnElimina.InvokeAsync();
 }
