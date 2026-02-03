@@ -1,58 +1,74 @@
-
 name: Deploy Blazor WASM to GitHub Pages (branch gh-pages)
 
 on:
   push:
-    branches: [ "main" ]
-  workflow_dispatch:
+    branches: [ "main" ]     # <— il branch su cui fai push da Visual Studio
+  workflow_dispatch:          # facoltativo: per lanciare manualmente dall’UI
 
 permissions:
-  contents: write    # per scrivere su gh-pages
+  contents: write             # richiesto da peaceiris per push su gh-pages
+
+# Evita run accodati: se pushi più volte, mantiene solo l'ultimo
+concurrency:
+  group: gh-pages
+  cancel-in-progress: true
 
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
 
     env:
-      PROJECT_PATH: BlazorApp1.csproj
-      PUBLISH_DIR: release/wwwroot
-      REPO_SUBDIR: web
+      PROJECT_PATH: BlazorApp1.csproj          # <— aggiorna se il .csproj ha un nome/percorso diverso
+      OUT_DIR:      build/publish
+      PUBLISH_DIR:  build/publish/wwwroot
+      REPO_SUBDIR:  web                        # <— sottocartella del sito su Pages
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: Setup .NET 10 SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "10.x"
+          dotnet-version: '10.0.x'
+          # Se stai usando una preview:
+          # dotnet-quality: 'preview'
 
-      - name: Publish Blazor (Release)
-        run: dotnet publish "${{ env.PROJECT_PATH }}" -c Release -o release --nologo
+      # (Opzionale ma consigliato) cache NuGet per velocizzare repeat build
+      - name: NuGet cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
 
-      - name: Add 404 fallback
-        run: cp "${{ env.PUBLISH_DIR }}/index.html" "${{ env.PUBLISH_DIR }}/404.html"
+      - name: Restore
+        run: dotnet restore "${{ env.PROJECT_PATH }}"
 
-      - name: Fix base href for /web/
+      - name: Publish (Release)
+        run: dotnet publish "${{ env.PROJECT_PATH }}" -c Release -o "${{ env.OUT_DIR }}" --nologo
+
+      # ? Fissa il <base href> su /web/ nell'index e poi crea 404 già corretto
+      - name: Fix <base href> for /${{ env.REPO_SUBDIR }}/ and create 404.html
         shell: bash
         run: |
-          index="${{ env.PUBLISH_DIR }}/index.html"
-          sed -i 's|<base href="/"|<base href="/'${{ env.REPO_SUBDIR }}'/"|g' "$index"
-          sed -i 's|<base href="./"|<base href="/'${{ env.REPO_SUBDIR }}'/"|g' "$index"
+          idx="${{ env.PUBLISH_DIR }}/index.html"
+          # sostituisce sia <base href="/"> sia <base href="./">
+          sed -i 's|<base href="/">|<base href="/'${{ env.REPO_SUBDIR }}'/">|g' "$idx"
+          sed -i 's|<base href="./">|<base href="/'${{ env.REPO_SUBDIR }}'/">|g' "$idx"
+          # crea 404.html dopo il fix, così ha la base corretta
+          cp "$idx" "${{ env.PUBLISH_DIR }}/404.html"
 
-      - name: Create .nojekyll in payload
-        run: bash -lc 'touch "${{ env.PUBLISH_DIR }}/.nojekyll"'
+      - name: Create .nojekyll
+        run: touch "${{ env.PUBLISH_DIR }}/.nojekyll"
 
-      - name: List payload (diagnostics)
+      # (Diagnostica utile se qualcosa non torna)
+      - name: List payload
+        shell: bash
         run: |
-          echo "Top-level of ${{ env.PUBLISH_DIR }}:"
-          ls -la "${{ env.PUBLISH_DIR }}"
-          echo ""
-          echo "Listing ${{ env.PUBLISH_DIR }}/_framework (if exists):"
-          ls -la "${{ env.PUBLISH_DIR }}/_framework" || true
-          echo ""
-          echo "First 30 lines of index.html:"
-          head -n 30 "${{ env.PUBLISH_DIR }}/index.html" || true
+          echo "wwwroot content:" && ls -la "${{ env.PUBLISH_DIR }}"
+          echo "Base tag in index.html:" && grep -o '<base href="[^"]*"' "${{ env.PUBLISH_DIR }}/index.html" || true
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
@@ -60,3 +76,5 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ${{ env.PUBLISH_DIR }}
           enable_jekyll: false
+          keep_files: false
+          commit_message: "Deploy: ${{ github.sha }}"
