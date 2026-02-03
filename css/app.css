@@ -113,3 +113,36 @@ code {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+/* Contenitore: riga fluida che va a capo */
+.impianti-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem; /* spazio fra cards */
+    align-items: stretch; /* le cards possono avere altezze diverse, ma allineate in alto */
+}
+
+    /* Cella contenitore della card: larghezza fissa, nessuna crescita/contrazione */
+    .impianti-grid .impianto-cell {
+        flex: 0 0 auto; /* non flettere */
+        width: 320px; /* <<< LARGHEZZA FISSA della card (puoi portarla a 340/360 se vuoi) */
+    }
+
+/* Card: altezza minima per armonia visiva e bordo morbido */
+.impianto-card { /* questa classe la usiamo già nel componente ImpiantoCard */
+    width: 100%; /* la card occupa tutta la cella da 320px */
+    min-height: 160px; /* opzionale: imposta una base estetica */
+    border-radius: 16px;
+}
+
+/* Mobile: sotto i 380px la card va “full?width” del viewport con margine */
+@media (max-width: 380px) {
+    .impianti-grid {
+        gap: 0.75rem;
+        padding-inline: 0.5rem;
+    }
+
+        .impianti-grid .impianto-cell {
+            width: 100%; /* 1 card per riga piena su schermi molto piccoli */
+        }
+}
