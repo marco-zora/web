@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|c:\\users\\marco\\onedrive - cnr\\zoratech\\visualstudio2026\\blazorapp1\\wwwroot\\index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|solutionrelative:wwwroot\\index.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|c:\\users\\marco\\onedrive - cnr\\zoratech\\visualstudio2026\\blazorapp1\\pages\\impianti.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|solutionrelative:pages\\impianti.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
@@ -30,15 +34,32 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
             },
             {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
+              "Title": "index.html",
+              "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\wwwroot\\index.html",
+              "RelativeDocumentMoniker": "wwwroot\\index.html",
+              "ToolTip": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\wwwroot\\index.html",
+              "RelativeToolTip": "wwwroot\\index.html",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2026-02-03T15:25:35.299Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "ImpiantoCard.razor",
               "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Shared\\ImpiantoCard.razor",
               "RelativeDocumentMoniker": "Shared\\ImpiantoCard.razor",
@@ -51,7 +72,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "ImpiantiModel.cs",
               "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Models\\ImpiantiModel.cs",
               "RelativeDocumentMoniker": "Models\\ImpiantiModel.cs",
@@ -63,7 +84,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "ImpiantoDettaglio.razor",
               "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\ImpiantoDettaglio.razor",
               "RelativeDocumentMoniker": "Pages\\ImpiantoDettaglio.razor",
@@ -75,7 +96,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Impianti.razor",
               "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\Impianti.razor",
               "RelativeDocumentMoniker": "Pages\\Impianti.razor",
@@ -88,7 +109,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "Admin.razor",
               "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\Admin.razor",
               "RelativeDocumentMoniker": "Pages\\Admin.razor",
