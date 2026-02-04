@@ -1,23 +1,49 @@
-﻿namespace BlazorApp1.Models
+﻿using System.Text.Json.Serialization;
+using System.Collections.Generic;
+
+namespace BlazorApp1.Models
 {
+    /// <summary>
+    /// Dizionario: user -> raccolta playlist di quell'utente
+    /// Esempio JSON:
+    /// { "marco": { "playlists": [ { "id":"...", "nome":"...", "items":[...] } ] } }
+    /// </summary>
     public class PlaylistsRoot : Dictionary<string, UserPlaylists> { }
 
     public class UserPlaylists
     {
-        public List<Playlist> playlists { get; set; } = new();
+        [JsonPropertyName("playlists")]
+        public List<Playlist> Playlists { get; set; } = new();
     }
 
     public class Playlist
     {
-        public string id { get; set; } = "";
-        public string nome { get; set; } = "";
-        public List<PlaylistItem> items { get; set; } = new();
+        [JsonPropertyName("id")]
+        public string Id { get; set; } = "";
+
+        [JsonPropertyName("nome")]
+        public string Nome { get; set; } = "";
+
+        // Nel codice userai .Items; nel JSON la chiave sarà "items"
+        [JsonPropertyName("items")]
+        public List<PlaylistItem> Items { get; set; } = new();
     }
 
     public class PlaylistItem
     {
-        public string tipo { get; set; } = "";   // "video" o "image"
-        public string path { get; set; } = "";   // relativo a /web/
-        public int durata { get; set; } = 5;     // solo per immagini
+        [JsonPropertyName("id")]
+        public string Id { get; set; } = "";
+
+        // "video" | "image"
+        [JsonPropertyName("tipo")]
+        public string Tipo { get; set; } = "video";
+
+        // URL o path all’asset (per ora placeholder)
+        [JsonPropertyName("url")]
+        public string Url { get; set; } = "";
+
+        // Durata in secondi (per immagini); per video puoi lasciarlo 0
+        [JsonPropertyName("durata")]
+        public int Durata { get; set; } = 10;
     }
 }
