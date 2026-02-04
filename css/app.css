@@ -146,3 +146,25 @@ code {
             width: 100%; /* 1 card per riga piena su schermi molto piccoli */
         }
 }
+
+.media-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.media-item {
+    width: 180px;
+    border-radius: 8px;
+    background: #f8f9fa;
+    padding: 6px;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,.1);
+}
+
+.media-item:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+}
+
