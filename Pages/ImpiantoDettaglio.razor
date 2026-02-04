@@ -72,16 +72,22 @@
 }
 else
 {
+
+
     <ul class="list-group">
+
         @foreach (var dev in Impianto!.monitors)
         {
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span>@dev.nome</span>
+                <div>
+                    <strong>@dev.nome</strong><br />
+                    <small class="text-muted">
+                        Playlist: @(dev.playlist ?? "Nessuna playlist")
+                    </small>
+                </div>
 
-                <span class="d-flex gap-2">
-
+                <div class="d-flex gap-2">
                     <button class="btn btn-sm btn-outline-secondary"
-                            title="Modifica Playlist"
                             @onclick="() => EditPlaylist(dev)">
                         <i class="bi bi-sliders"></i> Playlist
                     </button>
@@ -95,11 +101,14 @@ else
                             @onclick="() => DeleteDevice(dev)">
                         Elimina
                     </button>
-
-                </span>
+                </div>
             </li>
         }
+
     </ul>
+
+
+
 }
 
 @code {
@@ -204,4 +213,5 @@ else
 
         Nav.NavigateTo($"playlist/{User}/{IdImpianto}/{dev.id}");
     }
+
 }

@@ -25,6 +25,14 @@
         public string name { get; set; } = "";
         public string path { get; set; } = "";              // relativo al worker (UPLOADS/<user>/...)
         public string contentType { get; set; } = "";
+
+        public string startTime { get; set; } = ""; // HH:mm
         public double duration { get; set; } = 10;          // immagini: durata; video: opz., se 0 usa durata reale
     }
+
+
+
+
+
+
 }

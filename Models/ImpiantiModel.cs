@@ -26,6 +26,9 @@
         public string id { get; set; } = "";
         public string nome { get; set; } = "";
         public string tipo { get; set; } = "";
+        public string risoluzione { get; set; } = "";
+        public string? playlist { get; set; } = null;
+
     }
 
 }
