@@ -1,0 +1,26 @@
+﻿@page "/playlist/{User}/{IdImpianto}/{IdDevice}"
+
+@inject NavigationManager Nav
+
+<h3 class="mt-3">Playlist Editor (vuoto)</h3>
+
+<div class="alert alert-info mt-3">
+    <p><strong>User:</strong> @User</p>
+    <p><strong>Impianto:</strong> @IdImpianto</p>
+    <p><strong>Device:</strong> @IdDevice</p>
+</div>
+
+<button class="btn btn-secondary" @onclick="GoBack">
+    Torna all'impianto
+</button>
+
+@code {
+    [Parameter] public string User { get; set; } = "";
+    [Parameter] public string IdImpianto { get; set; } = "";
+    [Parameter] public string IdDevice { get; set; } = "";
+
+    private void GoBack()
+    {
+        Nav.NavigateTo($"impianto/{User}/{IdImpianto}");
+    }
+}

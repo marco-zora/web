@@ -3,8 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|c:\\users\\marco\\onedrive - cnr\\zoratech\\visualstudio2026\\blazorapp1\\.github\\workflows\\deploy.yml||{06C066C6-04A2-4E5D-8202-439FD4234EF1}",
-      "RelativeMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|solutionrelative:.github\\workflows\\deploy.yml||{06C066C6-04A2-4E5D-8202-439FD4234EF1}"
+      "AbsoluteMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|c:\\users\\marco\\onedrive - cnr\\zoratech\\visualstudio2026\\blazorapp1\\pages\\impiantodettaglio.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|solutionrelative:pages\\impiantodettaglio.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|c:\\users\\marco\\onedrive - cnr\\zoratech\\visualstudio2026\\blazorapp1\\pages\\playlist.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|solutionrelative:pages\\playlist.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|c:\\users\\marco\\onedrive - cnr\\zoratech\\visualstudio2026\\blazorapp1\\models\\impiantimodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|solutionrelative:models\\impiantimodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|c:\\users\\marco\\onedrive - cnr\\zoratech\\visualstudio2026\\blazorapp1\\pages\\impianti.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
@@ -18,19 +26,45 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Playlist.razor",
+              "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\Playlist.razor",
+              "RelativeDocumentMoniker": "Pages\\Playlist.razor",
+              "ToolTip": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\Playlist.razor",
+              "RelativeToolTip": "Pages\\Playlist.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-02-04T11:03:54.88Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "deploy.yml",
-              "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\.github\\workflows\\deploy.yml",
-              "RelativeDocumentMoniker": ".github\\workflows\\deploy.yml",
-              "ToolTip": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\.github\\workflows\\deploy.yml",
-              "RelativeToolTip": ".github\\workflows\\deploy.yml",
-              "ViewState": "AgIAACkAAAAAAAAAAAAmwEoAAAANAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
-              "WhenOpened": "2026-02-03T16:57:07.124Z",
+              "Title": "ImpiantoDettaglio.razor",
+              "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\ImpiantoDettaglio.razor",
+              "RelativeDocumentMoniker": "Pages\\ImpiantoDettaglio.razor",
+              "ToolTip": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\ImpiantoDettaglio.razor",
+              "RelativeToolTip": "Pages\\ImpiantoDettaglio.razor",
+              "ViewState": "AgIAAIkAAAAAAAAAAAAWwM4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-02-04T10:54:30.179Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ImpiantiModel.cs",
+              "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Models\\ImpiantiModel.cs",
+              "RelativeDocumentMoniker": "Models\\ImpiantiModel.cs",
+              "ToolTip": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Models\\ImpiantiModel.cs",
+              "RelativeToolTip": "Models\\ImpiantiModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-04T09:35:14.095Z",
               "EditorCaption": ""
             },
             {
@@ -47,13 +81,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "Impianti.razor",
               "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\Impianti.razor",
               "RelativeDocumentMoniker": "Pages\\Impianti.razor",
               "ToolTip": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\Impianti.razor",
               "RelativeToolTip": "Pages\\Impianti.razor",
-              "ViewState": "AgIAADMAAAAAAAAAAAAAAGQAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAABIAAAAAAAAAAAAAACMAAAA/AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-02-03T16:35:43.503Z",
               "EditorCaption": ""
