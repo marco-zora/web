@@ -10,29 +10,14 @@
     public class Playlist
     {
         public string id { get; set; } = "";
-        public string name { get; set; } = "";
-        public string? description { get; set; }
-        public bool loop { get; set; } = true;
-        public double defaultDuration { get; set; } = 10; // secondi per immagini (fallback)
-        public DateTimeOffset updatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public string nome { get; set; } = "";
         public List<PlaylistItem> items { get; set; } = new();
     }
 
     public class PlaylistItem
     {
-        public string id { get; set; } = "";
-        public string type { get; set; } = "";              // "video" | "image"
-        public string name { get; set; } = "";
-        public string path { get; set; } = "";              // relativo al worker (UPLOADS/<user>/...)
-        public string contentType { get; set; } = "";
-
-        public string startTime { get; set; } = ""; // HH:mm
-        public double duration { get; set; } = 10;          // immagini: durata; video: opz., se 0 usa durata reale
+        public string tipo { get; set; } = "";   // "video" o "image"
+        public string path { get; set; } = "";   // relativo a /web/
+        public int durata { get; set; } = 5;     // solo per immagini
     }
-
-
-
-
-
-
 }

@@ -1,23 +1,112 @@
 ﻿@page "/playlist/{User}/{IdImpianto}/{IdDevice}"
-
+@inject HttpClient Http
 @inject NavigationManager Nav
+@inject IJSRuntime JS
 
-<h3 class="mt-3">Playlist Editor (vuoto)</h3>
+@using BlazorApp1.Models
 
-<div class="alert alert-info mt-3">
-    <p><strong>User:</strong> @User</p>
-    <p><strong>Impianto:</strong> @IdImpianto</p>
-    <p><strong>Device:</strong> @IdDevice</p>
+<h3 class="mt-3 mb-4">Editor Playlist</h3>
+
+@if (!Loaded)
+{
+    <p>Caricamento…</p>
+    return;
+}
+
+@if (Error != null)
+{
+    <div class="alert alert-danger">@Error</div>
+    return;
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+
+        <h4>Device: <strong>@Device?.nome</strong></h4>
+        <p class="text-muted mb-1">
+            Impianto: @Impianto?.nome
+        </p>
+
+        <p class="mb-3">
+            <span class="badge bg-secondary">@User</span>
+        </p>
+
+        <hr />
+
+        <!-- QUI metteremo l'editor playlist vero -->
+        <h5 class="text-primary mb-3">Playlist corrente</h5>
+
+        <div class="mb-4">
+            <label class="form-label">Nome playlist assegnata</label>
+            <input class="form-control"
+                   @bind="Device!.playlist"
+                   placeholder="Nessuna playlist"
+                   disabled />
+        </div>
+
+        <button class="btn btn-primary" disabled>
+            <i class="bi bi-pencil"></i> Modifica Playlist (in arrivo)
+        </button>
+
+        <button class="btn btn-secondary ms-2" @onclick="GoBack">
+            Torna all'impianto
+        </button>
+
+    </div>
 </div>
 
-<button class="btn btn-secondary" @onclick="GoBack">
-    Torna all'impianto
-</button>
-
 @code {
+
     [Parameter] public string User { get; set; } = "";
     [Parameter] public string IdImpianto { get; set; } = "";
     [Parameter] public string IdDevice { get; set; } = "";
+
+    private string ProxyBase = "https://first.marcomaria-zora.workers.dev/api/dav/UPLOADS/";
+    private const string FileName = "impianti.json";
+
+    private ImpiantiRoot? Root;
+    private Impianto? Impianto;
+    private MonitorItem? Device;
+
+    private bool Loaded = false;
+    private string? Error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Root = await Http.GetFromJsonAsync<ImpiantiRoot>(ProxyBase + FileName);
+            Root ??= new ImpiantiRoot();
+
+            if (!Root.ContainsKey(User))
+            {
+                Error = $"Utente '{User}' non trovato.";
+                return;
+            }
+
+            Impianto = Root[User].impianti.FirstOrDefault(i => i.id == IdImpianto);
+
+            if (Impianto == null)
+            {
+                Error = "Impianto non trovato.";
+                return;
+            }
+
+            Device = Impianto.monitors.FirstOrDefault(m => m.id == IdDevice);
+
+            if (Device == null)
+            {
+                Error = "Device non trovato.";
+                return;
+            }
+
+            Loaded = true;
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+        }
+    }
 
     private void GoBack()
     {
