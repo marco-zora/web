@@ -1,3 +1,4 @@
+wwwroot\css\app.css
 wwwroot\favicon.png
 wwwroot\icon-192.png
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
@@ -45,7 +46,7 @@ wwwroot\lib\bootstrap\dist\js\bootstrap.js.map
 wwwroot\lib\bootstrap\dist\js\bootstrap.min.js
 wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map
 wwwroot\sample-data\weather.json
-wwwroot\css\app.css
+C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\wwwroot\css\app.css
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css
@@ -91,4 +92,3 @@ C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\wwwroot\lib\b
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\wwwroot\lib\bootstrap\dist\js\bootstrap.min.js
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map
 C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\wwwroot\sample-data\weather.json
-C:\Users\marco\OneDrive - CNR\ZORATECH\VisualStudio2026\BlazorApp1\wwwroot\css\app.css
