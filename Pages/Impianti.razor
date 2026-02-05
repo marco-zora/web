@@ -40,12 +40,16 @@
                     <i class="bi bi-person-circle"></i> @cliente
                 </h3>
 
+                @*
                 <button class="btn btn-success btn-sm shadow-sm"
                         @onclick="() => AddImpianto(cliente)">
                     <i class="bi bi-plus-circle"></i> Nuovo Impianto
                 </button>
-
-                <button class="button-a"> Button a </button>
+                *@
+                
+                <button class="button-a" style="display:flex; justify-content:flex-end;" @onclick="() => AddImpianto(cliente)">
+                    Button a 
+                </button>
 
             </div>
 
