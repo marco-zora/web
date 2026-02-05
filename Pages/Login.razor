@@ -22,66 +22,66 @@
     <button class="btn btn-primary w-100" @onclick="VerifyLogin">Entra</button>
 </div>
 
+
+
 @code {
-    private string ProxyBase = "https://first.marcomaria-zora.workers.dev/api/dav/UPLOADS/";
-    private const string FileName = "users.json";
+    //private string ProxyBase = "https://first.marcomaria-zora.workers.dev/api/dav/UPLOADS/";
+    //private const string FileName = "users.json";
 
-    private class UserRecord
-    {
-        public string user { get; set; } = "";
-        public string hash { get; set; } = "";
-        public string role { get; set; } = "user";
-    }
-
-    private List<UserRecord>? Users;
-    private bool Loaded = false;
+    // variabili collegate al form HTML
     private string? LoginUser;
     private string? LoginPass;
     private string? LoginError;
-    
+
+
+    private List<UserRecord>? Users;
+    private bool Loaded = false;
 
     protected override async Task OnInitializedAsync()
     {
-        try { Users = await Http.GetFromJsonAsync<List<UserRecord>>(ProxyBase + FileName); }
+        try { Users = await Http.GetFromJsonAsync<List<UserRecord>>(Global.ProxyBase + Global.UsersFileName); }
         catch { Users = null; }
         Loaded = true;
     }
-      
 
-    private static string Sha256(string input)
-    {
-        using var sha = System.Security.Cryptography.SHA256.Create();
-        var bytes = sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(input));
-        return Convert.ToHexString(bytes).ToLowerInvariant();
-    }
 
     private async Task VerifyLogin()
     {
-        if (Users is null)
+        LoginUser = "admin";
+        LoginPass = "admin";
+
+        if (Users is null)  // se non ci sono users nel file json
         {
             LoginError = "Impossibile leggere utenti.";
             return;
         }
-        if (string.IsNullOrWhiteSpace(LoginUser) || string.IsNullOrWhiteSpace(LoginPass))
+        if (string.IsNullOrWhiteSpace(LoginUser) || string.IsNullOrWhiteSpace(LoginPass))   // se le credenziali non sono state inserite correttamente
         {
             LoginError = "Inserisci username e password.";
             return;
         }
 
-        var hash = Sha256(LoginPass);
+        var hash = Global.Sha256(LoginPass);
+
         var match = Users.FirstOrDefault(u => u.user == LoginUser && u.hash == hash);
 
-        if (match is null)
+        if (match is null)  // se le credenziali non corrispondono a nessun user nel file json
         {
             LoginError = "Credenziali non valide.";
             return;
         }
 
-        await JS.InvokeVoidAsync("sessionStorage.setItem", "loggedUser", match.user);
-        await JS.InvokeVoidAsync("sessionStorage.setItem", "loggedRole", match.role);
+        // loggedUser e loggedRole vengono salvati nella memoria del browser e durano fino alla chiusura della TAB
+        //await JS.InvokeVoidAsync("sessionStorage.setItem", "loggedUser", match.user);
+        //await JS.InvokeVoidAsync("sessionStorage.setItem", "loggedRole", match.role);
+
+        await Global.LoggedUser(match.user);
+        await Global.LoggedRole(match.role);
 
         // URL riferiti a /web/ perchè in index.html <base href="/web/" />
         if (match.role == "admin") Nav.NavigateTo("admin", forceLoad: true); //await JS.InvokeVoidAsync("location.assign", "admin");
         else Nav.NavigateTo("upload", forceLoad: true);
     }
+
+    
 }

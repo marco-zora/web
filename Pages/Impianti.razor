@@ -3,10 +3,6 @@
 @inject IJSRuntime JS
 @inject NavigationManager Nav
 
-@using BlazorApp1.Models
-@using System.Net.Http.Json
-
-@using BlazorApp1.Shared;
 
 <!-- <h3 class="mt-3 mb-4">Gestione Impianti</h3> -->
 
@@ -103,8 +99,8 @@ else
 }
 
 @code {
-    private string ProxyBase = "https://first.marcomaria-zora.workers.dev/api/dav/UPLOADS/";
-    private const string FileName = "impianti.json";
+    //private string ProxyBase = "https://first.marcomaria-zora.workers.dev/api/dav/UPLOADS/";
+    //private const string FileName = "impianti.json";
 
     private string? LoggedUser;
     private string? LoggedRole;
@@ -136,7 +132,7 @@ else
         try
         {
             // 1) impianti.json
-            Root = await Http.GetFromJsonAsync<ImpiantiRoot>(ProxyBase + FileName);
+            Root = await Http.GetFromJsonAsync<ImpiantiRoot>(Global.ProxyBase + Global.InstallationFileName);
             Root ??= new ImpiantiRoot();
 
             // default colore se manca (retrocompatibilità)
@@ -145,7 +141,7 @@ else
                     imp.colore ??= "#e3f2fd";
 
             // 2) users.json: aggiungi anche utenti senza impianti
-            UsersList = await Http.GetFromJsonAsync<List<UserRecord>>(ProxyBase + "users.json");
+            UsersList = await Http.GetFromJsonAsync<List<UserRecord>>(Global.ProxyBase + Global.UsersFileName);
             UsersList ??= new List<UserRecord>();
 
             foreach (var u in UsersList)
@@ -178,7 +174,7 @@ else
         );
 
         using var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-        await Http.PutAsync(ProxyBase + FileName, content);
+        await Http.PutAsync(Global.ProxyBase + Global.InstallationFileName, content);
     }
 
     private async Task AddImpianto(string user)

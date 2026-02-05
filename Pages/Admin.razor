@@ -96,6 +96,7 @@ else
     {
         // Gate: solo admin
         var role = await JS.InvokeAsync<string>("sessionStorage.getItem", "loggedRole");
+
         if (!string.Equals(role, "admin", StringComparison.Ordinal))
         {
             Nav.NavigateTo("/login");
