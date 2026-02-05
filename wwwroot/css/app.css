@@ -193,12 +193,14 @@ code {
 }
 
 .button-a {
-    border: none;    
-    background-color: #A8E6CF;
+    border: none;
+    /*background-color: #F891B3;*/
+
+    background-color: #B2E2C5; 
     color: #ffff;
     padding: 10px 20px;
-    font-size: 10px;
-    width: 200px;
+    font-size: 15px;
+    width: 150px;
     border-radius: 10px;
     margin: auto;
     position: relative;

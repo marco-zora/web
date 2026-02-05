@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|c:\\users\\marco\\onedrive - cnr\\zoratech\\visualstudio2026\\blazorapp1\\pages\\impianti.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|solutionrelative:pages\\impianti.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|c:\\users\\marco\\onedrive - cnr\\zoratech\\visualstudio2026\\blazorapp1\\wwwroot\\css\\app.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
       "RelativeMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|solutionrelative:wwwroot\\css\\app.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|c:\\users\\marco\\onedrive - cnr\\zoratech\\visualstudio2026\\blazorapp1\\pages\\impianti.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{49BA0810-CF63-BACD-9969-F34D5336499D}|BlazorApp1.csproj|solutionrelative:pages\\impianti.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,17 +18,17 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "app.css",
               "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\wwwroot\\css\\app.css",
               "RelativeDocumentMoniker": "wwwroot\\css\\app.css",
               "ToolTip": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\wwwroot\\css\\app.css",
               "RelativeToolTip": "wwwroot\\css\\app.css",
-              "ViewState": "AgIAAKoAAAAAAAAAAAAAAMcAAAAQAAAAAAAAAA==",
+              "ViewState": "AgIAAKcAAAAAAAAAAAAAAMsAAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
               "WhenOpened": "2026-02-05T17:20:56.837Z",
               "EditorCaption": ""
@@ -47,13 +47,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Impianti.razor",
               "DocumentMoniker": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\Impianti.razor",
               "RelativeDocumentMoniker": "Pages\\Impianti.razor",
               "ToolTip": "C:\\Users\\marco\\OneDrive - CNR\\ZORATECH\\VisualStudio2026\\BlazorApp1\\Pages\\Impianti.razor",
               "RelativeToolTip": "Pages\\Impianti.razor",
-              "ViewState": "AgIAABAAAAAAAAAAAAAAAC8AAAASAAAAAAAAAA==",
+              "ViewState": "AgIAABAAAAAAAAAAAAAAADMAAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-02-05T16:32:26.65Z",
               "EditorCaption": ""
