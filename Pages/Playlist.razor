@@ -4,40 +4,113 @@
 @inject HttpClient Http
 @inject NavigationManager Nav
 
-<h3>Playlist – Editor (in arrivo)</h3>
+@using BlazorApp1.Shared
 
-<p class="text-muted">
-    User: <code>@User</code><br />
-    Impianto: <code>@ImpiantoId</code><br />
-    Device: <code>@DeviceId</code>
-</p>
+<h3 class="mb-4">Gestione Playlist</h3>
+
+@*
+
+@if (!Loaded)
+{
+    <p>Caricamento playlist…</p>
+    return;
+}
 
 @if (Error is not null)
 {
     <div class="alert alert-danger">@Error</div>
 }
-else if (!Loaded)
-{
-    <p>Caricamento…</p>
-}
-else
-{
-    <div class="alert alert-info">
-        Questa pagina verrà completata in seguito. Per ora il routing e i modelli funzionano.
-    </div>
 
-    <button class="btn btn-secondary" @onclick="GoBack">Torna indietro</button>
-}
+
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h5 class="mb-3">
+            <i class="bi bi-sliders"></i>
+            Playlist del device <strong>@DeviceId</strong>
+        </h5>
+
+        <div class="text-muted mb-3">
+            Utente: <code>@User</code><br />
+            Impianto: <code>@ImpiantoId</code><br />
+            Device: <code>@DeviceId</code>
+        </div>
+
+        @if (DevicePlaylist is null)
+        {
+            <div class="alert alert-warning">
+                Nessuna playlist ancora definita per questo device.
+            </div>
+
+            <button class="btn btn-primary" @onclick="CreateNewPlaylist">
+                Crea playlist per questo device
+            </button>
+        }
+        else
+        {
+            <h6>Contenuti playlist (@DevicePlaylist.Items.Count)</h6>
+
+            @if (DevicePlaylist.items.Count == 0)
+            {
+                <p class="text-muted">La playlist è vuota.</p>
+            }
+            else
+            {
+                <ul class="list-group mb-3">
+                    @foreach (var item in DevicePlaylist.items)
+                    {
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>
+                                <strong>@item.type</strong> —
+                                @item.path
+                                @if (item.type == "image")
+                                {
+                                    <span class="text-muted">( @item.duration s )</span>
+                                }
+                            </span>
+
+                            <button class="btn btn-sm btn-outline-danger"
+                                    @onclick="() => RemoveItem(item)">
+                                Elimina
+                            </button>
+                        </li>
+                    }
+                </ul>
+            }
+
+            <button class="btn btn-success me-2" @onclick="AddVideo">
+                + Aggiungi Video
+            </button>
+
+            <button class="btn btn-secondary me-2" @onclick="AddImage">
+                + Aggiungi Immagine
+            </button>
+
+            <button class="btn btn-primary" @onclick="SavePlaylist">
+                Salva Playlist
+            </button>
+        }
+    </div>
+</div>
+
+<button class="btn btn-outline-secondary" @onclick="GoBack">
+    Torna all’impianto
+</button>
 
 @code {
+    // === Parametri URL ===
     [Parameter] public string User { get; set; } = "";
     [Parameter] public string ImpiantoId { get; set; } = "";
     [Parameter] public string DeviceId { get; set; } = "";
 
+    // === Percorsi ===
     private string ProxyBase = "https://first.marcomaria-zora.workers.dev/api/dav/UPLOADS/";
     private const string FileName = "playlists.json";
 
+    // === Dati ===
     private PlaylistsRoot Root = new();
+    private Playlist? DevicePlaylist;
+
     private bool Loaded = false;
     private string? Error;
 
@@ -45,7 +118,6 @@ else
     {
         try
         {
-            // carica (se esiste) oppure usa struttura vuota
             var url = ProxyBase + FileName;
             var data = await Http.GetFromJsonAsync<PlaylistsRoot>(url);
             Root = data ?? new PlaylistsRoot();
@@ -54,16 +126,68 @@ else
             if (!Root.ContainsKey(User))
                 Root[User] = new UserPlaylists();
 
+            // cerca playlist del device
+            DevicePlaylist = Root[User].Playlists
+                .FirstOrDefault(p => p.Id == DeviceId && p .impiantoId == ImpiantoId);
+
             Loaded = true;
         }
         catch (Exception ex)
         {
-            // se il file non esiste o JSON vuoto, prosegui con Root vuoto
             Root = new PlaylistsRoot();
             Error = $"Avviso: {ex.Message}";
             Loaded = true;
         }
     }
 
-    private void GoBack() => Nav.NavigateTo($"impianto/{User}/{ImpiantoId}");
+    private void CreateNewPlaylist()
+    {
+        DevicePlaylist = new DevicePlaylist
+        {
+            impiantoId = ImpiantoId,
+            deviceId = DeviceId,
+            items = new List<PlaylistItem>()
+        };
+
+        Root[User].playlists.Add(DevicePlaylist);
+    }
+
+    private void RemoveItem(PlaylistItem item)
+    {
+        DevicePlaylist!.items.Remove(item);
+    }
+
+    private void AddVideo()
+    {
+        var path = $"videos/{Guid.NewGuid():N}.mp4"; // finto, edit completo dopo
+        DevicePlaylist!.items.Add(new PlaylistItem { type = "video", path = path, duration = 0 });
+    }
+
+    private void AddImage()
+    {
+        var path = $"images/{Guid.NewGuid():N}.jpg"; // finto
+        DevicePlaylist!.items.Add(new PlaylistItem
+        {
+            type = "image",
+            path = path,
+            duration = 5
+        });
+    }
+
+    private async Task SavePlaylist()
+    {
+        var json = System.Text.Json.JsonSerializer.Serialize(
+            Root,
+            new System.Text.Json.JsonSerializerOptions { WriteIndented = true }
+        );
+
+        using var content =
+            new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+        await Http.PutAsync(ProxyBase + FileName, content);
+    }
+
+    private void GoBack() =>
+        Nav.NavigateTo($"impianto/{User}/{ImpiantoId}");
 }
+*@

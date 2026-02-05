@@ -1,0 +1,55 @@
+﻿@using BlazorApp1.Models
+
+<div class="media-card d-flex align-items-center p-2 shadow-sm rounded">
+
+    <!-- Thumbnail -->
+    <div class="media-thumb me-3">
+        @if (Media.type == "image")
+        {
+            <img src="@Media.path" class="thumb-img" />
+        }
+        else if (Media.type == "video")
+        {
+            <video src="@Media.path" class="thumb-video" muted></video>
+        }
+        else
+        {
+            <div class="thumb-placeholder">?</div>
+        }
+    </div>
+
+    <!-- Info -->
+    <div class="flex-grow-1">
+        <div class="fw-bold">@Media.type.ToUpper()</div>
+        <div class="text-muted small">
+            Start: @Media.start s<br />
+            Durata: @Media.duration s
+        </div>
+    </div>
+
+    <!-- Pulsanti -->
+    <div class="d-flex flex-column gap-1">
+        <button class="btn btn-sm btn-outline-primary"
+                title="Modifica media"
+                @onclick="OnEdit">
+            <i class="bi bi-pencil"></i>
+        </button>
+
+        <button class="btn btn-sm btn-outline-danger"
+                title="Rimuovi media"
+                @onclick="OnDelete">
+            <i class="bi bi-trash"></i>
+        </button>
+    </div>
+
+</div>
+
+@code {
+    [Parameter] public MediaItem Media { get; set; } = default!;
+
+    [Parameter] public EventCallback OnEditRequested { get; set; }
+    [Parameter] public EventCallback OnDeleteRequested { get; set; }
+
+    private Task OnEdit() => OnEditRequested.InvokeAsync();
+    private Task OnDelete() => OnDeleteRequested.InvokeAsync();
+}

@@ -21,29 +21,41 @@ namespace BlazorApp1.Models
         [JsonPropertyName("id")]
         public string Id { get; set; } = "";
 
-        [JsonPropertyName("nome")]
-        public string Nome { get; set; } = "";
+        [JsonPropertyName("name")]
+        public string Name { get; set; } = "";
 
         // Nel codice userai .Items; nel JSON la chiave sarà "items"
         [JsonPropertyName("items")]
         public List<PlaylistItem> Items { get; set; } = new();
     }
 
+
+    // forse non PlaylistItem NON serve 
     public class PlaylistItem
     {
         [JsonPropertyName("id")]
         public string Id { get; set; } = "";
 
         // "video" | "image"
-        [JsonPropertyName("tipo")]
-        public string Tipo { get; set; } = "video";
+        [JsonPropertyName("type")]
+        public string Type { get; set; } = "video";
 
         // URL o path all’asset (per ora placeholder)
         [JsonPropertyName("url")]
         public string Url { get; set; } = "";
 
         // Durata in secondi (per immagini); per video puoi lasciarlo 0
-        [JsonPropertyName("durata")]
-        public int Durata { get; set; } = 10;
+        [JsonPropertyName("duration")]
+        public int Duration { get; set; } = 10;
+    }
+
+
+    public class MediaItem
+    {
+        public string id { get; set; } = "";
+        public string type { get; set; } = "";     // "image" | "video"
+        public string path { get; set; } = "";     // URL media
+        public double start { get; set; } = 0;     // seconds
+        public double duration { get; set; } = 5;  // seconds
     }
 }
